@@ -1,0 +1,186 @@
+import * as React from "react";
+import { Button as MaterialUIButton, ButtonProps as MuiButtonProps } from "@mui/material";
+import { useStoreConfigCtx } from "@/contextHooks/useStoreConfigCtx";
+import { cn } from "@/lib/utils";
+
+export type ButtonVariant =
+  | "default"
+  | "secondary"
+  | "destructive"
+  | "danger"
+  | "outline"
+  | "ghost"
+  | "link";
+
+export interface ButtonProps extends Omit<MuiButtonProps, "variant" | "color"> {
+  variant?: ButtonVariant;
+  size?: "sm" | "default" | "lg" | "icon";
+  asChild?: boolean;
+}
+
+export const buttonVariants = ({ variant = "default", size = "default" }: { variant?: ButtonVariant, size?: "sm" | "default" | "lg" | "icon" } = {}) => {
+  const base = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50";
+  
+  const variants = {
+    default: "bg-primary text-primary-foreground shadow hover:bg-primary/90",
+    destructive: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+    danger: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+    outline: "border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground",
+    secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
+    ghost: "hover:bg-accent hover:text-accent-foreground",
+    link: "text-primary underline-offset-4 hover:underline",
+  };
+
+  const sizes = {
+    default: "h-9 px-4 py-2",
+    sm: "h-8 rounded-md px-3 text-xs",
+    lg: "h-10 rounded-md px-8",
+    icon: "h-9 w-9",
+  };
+
+  return cn(
+    base,
+    variants[variant as keyof typeof variants] || variants.default,
+    sizes[size as keyof typeof sizes] || sizes.default
+  );
+};
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    {
+      variant = "default",
+      size = "default",
+      children,
+      sx,
+      ...props
+    },
+    ref
+  ) => {
+    const {
+      state: { currentTheme: theme },
+    } = useStoreConfigCtx();
+
+    const muiVariant: MuiButtonProps["variant"] = (() => {
+      switch (variant) {
+        case "outline":
+          return "outlined";
+        case "ghost":
+        case "link":
+          return "text";
+        default:
+          return "contained";
+      }
+    })();
+
+    const sizeMap: Record<string, MuiButtonProps["size"]> = {
+      sm: "small",
+      default: "medium",
+      lg: "large",
+      icon: "medium",
+    };
+
+    const variantSx: object = (() => {
+      const base = {
+        textTransform: "none",
+        fontWeight: 500,
+        letterSpacing: "0.01em",
+        borderRadius: "8px",
+        transition: "all 0.2s ease",
+        boxShadow: "none",
+        "&:hover": { boxShadow: "none" },
+      };
+
+      switch (variant) {
+        case "secondary":
+          return {
+            ...base,
+            backgroundColor: theme.secondary,
+            color: theme.text,
+            "&:hover": {
+              ...base["&:hover"],
+              backgroundColor: theme.secondary,
+              filter: "brightness(0.93)",
+            },
+          };
+        case "destructive":
+        case "danger":
+          return {
+            ...base,
+            backgroundColor: theme.error,
+            color: theme.textInverse,
+            "&:hover": {
+              ...base["&:hover"],
+              backgroundColor: theme.error,
+              filter: "brightness(0.88)",
+            },
+          };
+        case "outline":
+          return {
+            ...base,
+            borderColor: theme.border,
+            color: theme.text,
+            backgroundColor: "transparent",
+            "&:hover": {
+              ...base["&:hover"],
+              backgroundColor: `${theme.primary}10`,
+              borderColor: theme.primary,
+            },
+          };
+        case "ghost":
+          return {
+            ...base,
+            color: theme.text,
+            backgroundColor: "transparent",
+            "&:hover": {
+              ...base["&:hover"],
+              backgroundColor: `${theme.primary}12`,
+            },
+          };
+        case "link":
+          return {
+            ...base,
+            color: theme.link,
+            backgroundColor: "transparent",
+            padding: 0,
+            minWidth: "unset",
+            textDecoration: "underline",
+            textUnderlineOffset: "3px",
+            "&:hover": {
+              ...base["&:hover"],
+              backgroundColor: "transparent",
+              opacity: 0.75,
+            },
+          };
+        default:
+          return {
+            ...base,
+            backgroundColor: theme.primary,
+            color: theme.textInverse,
+            "&:hover": {
+              ...base["&:hover"],
+              backgroundColor: theme.primary,
+              filter: "brightness(0.88)",
+            },
+          };
+      }
+    })();
+
+    return (
+      <MaterialUIButton
+         type="button"
+        ref={ref}
+        variant={muiVariant}
+        size={sizeMap[size]}
+        disableElevation
+        sx={{ ...variantSx, ...sx }}
+        {...props}
+      >
+        {children}
+      </MaterialUIButton>
+    );
+  }
+);
+
+Button.displayName = "Button";
+
+export { Button };
