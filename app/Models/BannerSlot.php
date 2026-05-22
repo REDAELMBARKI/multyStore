@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\HasStore;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class BannerSlot extends Model
 {
+    use HasStore;
     protected $fillable = [
         'banner_id',
         'slot_key',

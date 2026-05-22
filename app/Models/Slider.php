@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\HasStore;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Slider extends Model
 {
-    use HasFactory;
+    use HasFactory, HasStore;
 
     protected $fillable = [
         'name',

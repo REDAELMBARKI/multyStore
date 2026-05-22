@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasStore;
+
 use Illuminate\Database\Eloquent\Model;
 
 class PAttr extends Model
 {
+    use HasStore;
     
     protected $table = 'product_attributes' ;
     protected $fillable = [

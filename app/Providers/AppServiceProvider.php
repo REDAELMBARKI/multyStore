@@ -20,7 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(\App\Services\tenancy\StoreManager::class, function () {
+            return new \App\Services\tenancy\StoreManager();
+        });
     }
 
     /**
@@ -29,6 +31,8 @@ class AppServiceProvider extends ServiceProvider
   
     public function boot(): void
     {
+        // Add middleware to the global stack or web group
+        // In Laravel 11+, we do this in bootstrap/app.php
         Order::observe(OrderObserver::class);
         Vite::prefetch(concurrency: 3);
         Route::middleware('web') 

@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\HasStore;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class OrderItem extends Model
 {
-    use HasFactory;
+    use HasFactory, HasStore;
     protected $table = 'order_items' ;
     protected $guarded = [];
     protected $hidden = [

@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasStore;
+
 use Illuminate\Database\Eloquent\Model;
 
 class AttributesValues extends Model
-{   protected $table = 'attribute_values';
+{
+    use HasStore;   protected $table = 'attribute_values';
     protected $fillable = [
         'attribute_id',
         'name' ,

@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasStore;
+
 use Illuminate\Database\Eloquent\Model;
 
 class Invitation extends Model
 {
+    use HasStore;
     protected $fillable = [
         'email',
         'role_id',

@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\HasStore;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Promotion extends Model
 {
+    use HasStore;
     /** @use HasFactory<\Database\Factories\PromotionFactory> */
     use HasFactory;
     protected $guarded = [];

@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\HasStore;
+
 use Google\Service\Compute\Rule;
 use Illuminate\Database\Eloquent\Model;
 
 class RuleBasedCollection extends Model
 {
+    use HasStore;
    protected $table = 'rule_based_collections';
    protected $fillable = [
        'name',

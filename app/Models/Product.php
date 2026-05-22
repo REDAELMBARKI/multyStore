@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasStore;
 use Carbon\Cli\Invoker;
 use Faker\Core\File;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,7 +13,7 @@ use Illuminate\Support\Collection;
 class Product extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductFactory> */
-    use HasFactory;
+    use HasFactory, HasStore;
 
     protected $fillable = [
         'name',
