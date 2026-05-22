@@ -24,6 +24,7 @@ Homestead.yaml
 Thumbs.db
 
 
+
 #logs
 *.log
 
@@ -33,3 +34,27 @@ Thumbs.db
 #package-lock.json
 vendor/
 node_modules/
+
+
+# Proprietary Core Logic
+routes/web.php
+secret.key
+encryption_cycle.log
+*.enc
+
+# Backend Logic Isolation\ remove these name the controolers and services expllicictly 
+app/Http/Controllers/*
+!app/Http/Controllers/Controller.php
+!app/Http/Controllers/Auth/
+!app/Http/Controllers/Tenancy/
+!app/Http/Controllers/RoleController.php
+!app/Http/Controllers/MarketplaceController.php
+
+app/Services/*
+
+
+app/Repositories/*
+
+
+# // frontend 
+resources/js/Pages/admin/*
