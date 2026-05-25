@@ -70,7 +70,7 @@ export  const productFilesUploaderCleaner = () => {
       }
 
 
- return { cleanProductTempMediaOnDistroy , uploadProductFiles , deleteMedia}
+      return { cleanProductTempMediaOnDistroy , uploadProductFiles , deleteMedia}
  
 }
 
