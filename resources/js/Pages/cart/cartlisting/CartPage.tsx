@@ -37,6 +37,8 @@ export interface Milestone {
     type: 'discount' | 'free_shipping';
     estimated_value: number;
     message: string;
+    percentage?: number;
+    max?: number;
 }
 
 export default function CartPage({ onStepChange }: CartPageProps) {
@@ -157,6 +159,25 @@ export default function CartPage({ onStepChange }: CartPageProps) {
     
 
 
+    useEffect(() => {
+        if (!currAndNextMilestone?.curr) return;
+
+        const milestone = currAndNextMilestone.curr;
+        if (milestone.type === 'discount' && milestone.percentage) {
+            const calculatedDiscount = subtotal * (milestone.percentage / 100);
+            const scaledValue = milestone.max 
+                ? Math.min(calculatedDiscount, milestone.max) 
+                : calculatedDiscount;
+
+            if (scaledValue !== milestone.estimated_value) {
+                setCurrAndNextMilestone(prev => prev ? ({
+                    ...prev,
+                    curr: { ...prev.curr!, estimated_value: scaledValue }
+                }) : null);
+            }
+        }
+    }, [subtotal, milestones]);
+
    useEffect(() => {
       console.log("millestones" , milestones)
    }, [milestones]);
@@ -221,6 +242,7 @@ export default function CartPage({ onStepChange }: CartPageProps) {
                         <div className="lg:col-span-1">
                             {(() => {
                                 const isFreeShippingReached = currAndNextMilestone?.curr?.type === 'free_shipping' || shipping === 0;
+                                
                                 return (
                                     <CartSummary
                                         subtotal={subtotal}

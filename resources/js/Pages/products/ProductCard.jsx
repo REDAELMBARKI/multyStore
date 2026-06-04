@@ -1,10 +1,7 @@
 import React from 'react';
 import { Heart, ShoppingCart, Star, Eye } from 'lucide-react';
 import { useStoreConfigCtx } from '@/contextHooks/useStoreConfigCtx';
-import { Link } from '@inertiajs/react';
-// import { motion } from 'framer-motion';
-// import { Product } from '../../types';
-
+import { Link, usePage } from '@inertiajs/react';
 
 /**
  * Product card component with hover effects and quick actions
@@ -15,6 +12,7 @@ export const ProductCard= ({
   variant = 'default' 
 }) => {
   const { state: { currentTheme: theme } } = useStoreConfigCtx();
+  const { storeCurrency } = usePage().props;
   // const { state, dispatch } = useCart();
   // const isInCart = state.cartItems.some(item => item.product.id === product.id);
 
@@ -132,11 +130,11 @@ export const ProductCard= ({
                       {/* Price */}
                       <div className="flex items-center space-x-2 mb-2">
                           <span style={{ color: theme.primary }} className="text-lg font-bold">
-                              ${product.price.toFixed(2)}
+                              {product.price.toFixed(2)} {storeCurrency}
                           </span>
                           {product.originalPrice && (
                               <span style={{ color: theme.textMuted }} className="text-sm line-through">
-                                  ${product.originalPrice.toFixed(2)}
+                                  {product.originalPrice.toFixed(2)} {storeCurrency}
                               </span>
                           )}
                       </div>

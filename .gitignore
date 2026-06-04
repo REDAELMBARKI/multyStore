@@ -36,25 +36,25 @@ vendor/
 node_modules/
 
 
-# Proprietary Core Logic
-routes/web.php
-secret.key
-encryption_cycle.log
-*.enc
+# # Proprietary Core Logic
+# routes/web.php
+# secret.key
+# encryption_cycle.log
+# *.enc
 
-# Backend Logic Isolation\ remove these name the controolers and services expllicictly 
-app/Http/Controllers/*
-!app/Http/Controllers/Controller.php
-!app/Http/Controllers/Auth/
-!app/Http/Controllers/Tenancy/
-!app/Http/Controllers/RoleController.php
-
-
-app/Services/*
+# # Backend Logic Isolation\ remove these name the controolers and services expllicictly 
+# app/Http/Controllers/*
+# !app/Http/Controllers/Controller.php
+# !app/Http/Controllers/Auth/
+# !app/Http/Controllers/Tenancy/
+# !app/Http/Controllers/RoleController.php
 
 
-app/Repositories/*
+# app/Services/*
 
 
-# // frontend 
-resources/js/Pages/admin/*
+# app/Repositories/*
+
+
+# # // frontend 
+# resources/js/Pages/admin/*

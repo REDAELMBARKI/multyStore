@@ -33,7 +33,6 @@ return new class extends Migration
             'invitations',
             'home_layout_orcs',
             'product_attributes',
-            'materials',
             'google_sheets'
         ];
 

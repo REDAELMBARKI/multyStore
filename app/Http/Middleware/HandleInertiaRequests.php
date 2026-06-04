@@ -58,6 +58,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'cartCount' => $request->user() ? Cart::where('user_id', $request->user()->id)->sum('quantity') : 0,
             'cartItems' => $request->user() ? app(\App\Services\CartService::class)->getCartItems(false) : [],
+            'storeCurrency' => app(\App\Services\StoreSettingService::class)->getStoreCurrency(),
         ];
     }
 }

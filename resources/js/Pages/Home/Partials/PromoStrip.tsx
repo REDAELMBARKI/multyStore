@@ -11,15 +11,15 @@ export type Promotion = {
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
-function formatDiscount(p: Promotion): string {
+function formatDiscount(p: Promotion, currency: string): string {
   if (p.type === "free_shipping") return "LIVRAISON\nGRATUITE"
   if (p.type === "percentage") return `-${p.value}%`
-  return `-${p.value} DH`
+  return `-${p.value} ${currency}`
 }
 
-function formatThreshold(p: Promotion): string | null {
+function formatThreshold(p: Promotion, currency: string): string | null {
   if (!p.minimum_order_amount) return null
-  return `DÈS ${p.minimum_order_amount.toLocaleString("fr-MA")} DH`
+  return `DÈS ${p.minimum_order_amount.toLocaleString("fr-MA")} ${currency}`
 }
 
 function formatValidity(dateStr: string | null): string | null {
@@ -51,6 +51,7 @@ const SHAPES = Array.from({ length: 22 }, (_, i) => ({
 
 
 import { useStoreConfigCtx } from "@/contextHooks/useStoreConfigCtx"
+import { usePage } from "@inertiajs/react"
 // ─── PromoStrip component ─────────────────────────────────────────────────────
 
 import { useEffect, useRef, useState, useCallback } from "react"
@@ -169,10 +170,11 @@ export const PromoStrip: React.FC<PromoStripProps> = ({
 
   if (!total) return null
 
+  const { storeCurrency } = usePage().props as any
   const promo = promotions[current]
   const bgColor = theme.promotionBg[promo.type]
-  const discount = formatDiscount(promo)
-  const threshold = formatThreshold(promo)
+  const discount = formatDiscount(promo, storeCurrency)
+  const threshold = formatThreshold(promo, storeCurrency)
   const validity = formatValidity(promo.valid_until)
   const title = getTitle(promo)
   const multiline = discount.includes("\n")

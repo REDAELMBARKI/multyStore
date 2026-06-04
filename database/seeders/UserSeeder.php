@@ -20,7 +20,7 @@ class UserSeeder extends Seeder{
 
         // Ensure roles exist with verb-based claims
         $superAdminRole = \App\Models\Role::updateOrCreate(
-            ['name' => 'super admin'],
+            ['name' => 'super_admin'],
             ['claims' => [
                 'manages-products', 'manages-orders', 'manages-customers', 
                 'views-reports', 'manages-settings', 'manages-roles', 

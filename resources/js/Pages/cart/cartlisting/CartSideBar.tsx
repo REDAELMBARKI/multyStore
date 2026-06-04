@@ -1,7 +1,8 @@
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import { X } from "lucide-react";
 
 function CartSideBar({cartItems , onClose , total}:{cartItems:any ;  onClose : any  ;  total : any }) {
+    const { storeCurrency } = usePage().props as any;
    
     return ( 
       
@@ -34,7 +35,7 @@ function CartSideBar({cartItems , onClose , total}:{cartItems:any ;  onClose : a
                       />
                       <div className="flex-1">
                         <h3 className="text-sm font-medium text-gray-900">{name}</h3>
-                        <p className="text-sm text-gray-600">{item.quantity} x ${Number(price).toFixed(2)}</p>
+                        <p className="text-sm text-gray-600">{item.quantity} x {Number(price).toFixed(2)} {storeCurrency}</p>
                       </div>
                     </div>
                   );
@@ -42,7 +43,7 @@ function CartSideBar({cartItems , onClose , total}:{cartItems:any ;  onClose : a
               </div>
               <div className="mt-8 pt-6 border-t">
                 <div className="text-lg font-semibold text-gray-900 mb-4">
-                  Total: ${total.toFixed(2)}
+                  Total: {total.toFixed(2)} {storeCurrency}
                 </div>
                 <div className="space-y-3">
                   <button className="w-full bg-gray-900 text-white py-3 px-4 rounded-md hover:bg-gray-800 transition-colors">

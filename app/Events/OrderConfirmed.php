@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Models\Order;
+use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -18,7 +19,7 @@ class OrderConfirmed
     /**
      * Create a new event instance.
      */
-    public function __construct(public Order $order)
+    public function __construct(public Order $order )
     {
     }
 
