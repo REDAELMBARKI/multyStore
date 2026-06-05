@@ -16,9 +16,12 @@ class NotifyAdmins implements ShouldQueue
     use InteractsWithQueue, Queueable;
     public function handle(OrderConfirmed $event): void
     {
-        $admins = $this->getRecipients() ;
-        Mail::bcc($admins)
-            ->queue(new OrderConfirmedMail($event->order ));
+        $admins = $this->getRecipients();
+        
+        foreach ($admins as $adminEmail) {
+            Mail::to($adminEmail)
+                ->queue(new OrderConfirmedMail($event->order));
+        }
     }
 
     public function getRecipients() : array {

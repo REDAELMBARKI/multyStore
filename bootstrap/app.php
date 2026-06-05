@@ -16,14 +16,21 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->web(prepend: [
+            \App\Http\Middleware\IdentifyTenant::class,
+        ]);
+        
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 
-        // exclude webhook from CSRF
+        // exclude from CSRF
         $middleware->validateCsrfTokens(except: [
             'api/webhook/stripe',
+            'register',
+            'login',
+            'logout',
         ]);
 
         //

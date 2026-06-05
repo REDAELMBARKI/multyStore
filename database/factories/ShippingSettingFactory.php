@@ -10,7 +10,7 @@ class ShippingSettingFactory extends Factory
     public function definition(): array
     {
         return [
-            'store_id'                       => Store::factory(),
+            'store_id'                       => Store::inRandomOrder()->first()?->id ?? 1,
             'free_shipping_type'             => 'amount',
             'free_shipping_threshold_amount' => 500,
             'free_shipping_threshold_items'  => null,

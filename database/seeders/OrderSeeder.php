@@ -11,7 +11,7 @@ class OrderSeeder extends Seeder
 {
     public function run()
     {        
-            $storeId = Store::first()->id;
+            $storeId = Store::inRandomOrder()->first()->id;
 
             \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
             OrderItem::query()->delete();

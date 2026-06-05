@@ -37,7 +37,9 @@ class OrderService
         }
 
         public function getOrders(){
-           return OrderResource::collection(Order::with('user:id,name,email' , 'items.productVariant.product.thumbnail' , 'address')->paginate(10));
+           return OrderResource::collection(Order::with('user:id,name,email' , 'items.productVariant.product.thumbnail' , 'address')
+                                ->orderByDesc("created_at")
+                                ->paginate(10));
         }
 
         public function getStats(){

@@ -20,8 +20,8 @@ class ReviewFactory extends Factory
     public function definition(): array
     {
         return [
-            'store_id' => Store::factory(),
-            'user_id' => User::inRandomOrder()->first()->id,
+            'store_id' => Store::inRandomOrder()->first()?->id ?? 1,
+            'user_id' => User::inRandomOrder()->first()?->id ?? User::factory(),
             'product_id' => Product::inRandomOrder()->first()->id,
             'text' => $this->faker->sentence,
             'rating' => $this->faker->randomElement([2.5,3,3.5,4,4.5,5])

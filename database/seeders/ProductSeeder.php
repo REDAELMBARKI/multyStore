@@ -23,10 +23,18 @@ class ProductSeeder extends Seeder
         ProductVariant::truncate();
         Product::truncate();
         Media::whereIn('collection', ['thumbnail', 'gallery'])->delete();
-        Schema::enableForeignKeyConstraints();
 
-        $men = 2; $women = 3; $shoes = 5; $watches = 63;
-        $new = 2; $featured = 6; $hot = 3; $sale = 4;
+        // Get Badges from Badge model
+        $new = Badge::where('name', 'New')->first()?->id;
+        $featured = Badge::where('name', 'Featured')->first()?->id;
+        $hot = Badge::where('name', 'Hot')->first()?->id;
+        $sale = Badge::where('name', 'Sale')->first()?->id;
+
+        // Get Categories from Category model
+        $men = Category::where('slug', 'men')->first()?->id;
+        $women = Category::where('slug', 'women')->first()?->id;
+        $shoes = Category::where('slug', 'shoes')->first()?->id;
+        $watches = Category::where('slug', 'watches')->first()?->id;
 
         $productPool = [
             // MEN (id: 2)
@@ -111,5 +119,7 @@ class ProductSeeder extends Seeder
                 'is_temporary' => 0,
             ]);
         }
+
+        Schema::enableForeignKeyConstraints();
     }
 }

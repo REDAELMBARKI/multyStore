@@ -19,7 +19,7 @@ class TagFactory extends Factory
     public function definition(): array
     {
         return [
-            'store_id' => Store::factory(),
+            'store_id' => Store::inRandomOrder()->first()->id,
             "name"=> $name =  $this->faker->name,
             "slug"=>Str::slug($name),
         ];

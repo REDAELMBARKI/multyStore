@@ -19,7 +19,7 @@ class PromotionFactory extends Factory
         };
 
         return [
-            'store_id' => Store::factory(),
+            'store_id' => Store::inRandomOrder()->first()?->id ?? 1,
             'name' => $this->faker->randomElement([
                 'Summer Sale',
                 'Flash Deal',

@@ -10,7 +10,7 @@ class ShippingZoneFactory extends Factory
     public function definition(): array
     {
         return [
-            'store_id'       => Store::factory(),
+            'store_id'       => Store::inRandomOrder()->first()?->id ?? 1,
             'name'           => $this->faker->word(),
             'type'           => $this->faker->randomElement(['fixed', 'calculated']),
             'price'          => $this->faker->randomElement([30, 40, 50, 60]),

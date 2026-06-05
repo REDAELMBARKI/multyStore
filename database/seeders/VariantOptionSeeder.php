@@ -22,32 +22,33 @@ class VariantOptionSeeder extends Seeder
 
         foreach ($parents as $parentKey => $children) {
 
-            $parentId = DB::table('variants_options_settings')->insertGetId([
-                'key' => $parentKey,
-                'value' => null,
-                'hex' => null, // important
-                'parent_id' => null,
-            ]);
+            // Use updateOrInsert to avoid duplicate parent keys
+            DB::table('variants_options_settings')->updateOrInsert(
+                ['key' => $parentKey, 'parent_id' => null],
+                ['value' => null, 'hex' => null]
+            );
+
+            $parentId = DB::table('variants_options_settings')
+                ->where('key', $parentKey)
+                ->whereNull('parent_id')
+                ->first()
+                ->id;
 
             foreach ($children as $childValue) {
 
                 // If color (array with name + hex)
                 if ($parentKey === 'color') {
-                    DB::table('variants_options_settings')->insert([
-                        'key' => $parentKey,
-                        'value' => $childValue['name'],
-                        'hex' => $childValue['hex'],
-                        'parent_id' => $parentId,
-                    ]);
+                    DB::table('variants_options_settings')->updateOrInsert(
+                        ['key' => $parentKey, 'value' => $childValue['name'], 'parent_id' => $parentId],
+                        ['hex' => $childValue['hex']]
+                    );
                 } 
                 // Normal options
                 else {
-                    DB::table('variants_options_settings')->insert([
-                        'key' => $parentKey,
-                        'value' => $childValue,
-                        'hex' => null,
-                        'parent_id' => $parentId,
-                    ]);
+                    DB::table('variants_options_settings')->updateOrInsert(
+                        ['key' => $parentKey, 'value' => $childValue, 'parent_id' => $parentId],
+                        ['hex' => null]
+                    );
                 }
             }
         }
