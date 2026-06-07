@@ -11,13 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('store_settings', function (Blueprint $table) {
-            // Drop the old unique constraint on 'key'
-            $table->dropUnique('store_settings_key_unique');
-            
-            // Add a new composite unique constraint
-            $table->unique(['store_id', 'key']);
-        });
+        // Handled in the base migration
     }
 
     /**

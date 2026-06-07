@@ -13,10 +13,11 @@ return new class extends Migration {
     {
         Schema::create('promotions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('store_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('name');
             $table->enum('type', ['percentage', 'free_shipping']);
             $table->decimal('value', 10, 2)->default(0);
-            $table->decimal('minimum_order_amount', 10, 2)->nullable()->unique();
+            $table->decimal('minimum_order_amount', 10, 2)->nullable();
             $table->integer('minimum_items')->nullable();
             $table->decimal('max_discount_amount', 10, 2)->nullable();
             $table->integer('max_uses')->nullable();
@@ -25,6 +26,8 @@ return new class extends Migration {
             $table->dateTime('valid_until')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+
+            $table->unique(['store_id', 'minimum_order_amount']);
         });
     }
 

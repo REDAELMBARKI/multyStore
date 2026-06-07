@@ -26,25 +26,33 @@ class NewStoreDefaultsSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-    public function run(int $storeId = null): void
+    public function run(?int $storeId = null): void
     {
-        if (!$storeId) {
-            $storeId = Store::first()->id;
-        }
+        $storeId = $storeId ?? Store::first()?->id;
 
         if (!$storeId) {
             return;
         }
+        
 
         DB::transaction(function () use ($storeId) {
-            // 0. Use Global Badges (Avoid duplicates due to unique name constraint)
-            $badgesData = ['None', 'New', 'Hot', 'Sale', 'Limited', 'Featured'];
+            // 0. Seed Store-Specific Badges
+            $badgesData = [
+                ['name' => 'None',     'color' => 'transparent', 'icon' => 'Ban'],
+                ['name' => 'New',      'color' => '#22c55e',     'icon' => 'Sparkles'],
+                ['name' => 'Hot',      'color' => '#f97316',     'icon' => 'Flame'],
+                ['name' => 'Sale',     'color' => '#ef4444',     'icon' => 'Tag'],
+                ['name' => 'Limited',  'color' => '#a855f7',     'icon' => 'Zap'],
+                ['name' => 'Featured', 'color' => '#3b82f6',     'icon' => 'Rocket'],
+            ];
+
             $badgeMap = [];
-            foreach ($badgesData as $bName) {
-                $badge = Badge::withoutGlobalScopes()->where('name', $bName)->first();
-                if ($badge) {
-                    $badgeMap[$bName] = $badge->id;
-                }
+            foreach ($badgesData as $bData) {
+                $badge = Badge::updateOrCreate(
+                    ['store_id' => $storeId, 'name' => $bData['name']],
+                    $bData
+                );
+                $badgeMap[$bData['name']] = $badge->id;
             }
 
             // 1. Seed Categories & Subcategories
@@ -106,62 +114,132 @@ class NewStoreDefaultsSeeder extends Seeder
                 );
             }
 
-            // 4. Seed Banners (Copied from BannerSeeder)
-            $bannersData = [
-                [
-                    "banner" => [
-                        'name'          => 'Spring Luxury 2026',
-                        'key'           => 'spring_2026',
-                        'slug'          => 'spring-2026-' . $storeId,
-                        'direction'     => 'ltr',
-                        'is_active'     => true,
-                        'aspect_ratio'  => '21:9',
+            // 4. Seed Banners (Three distinct styles: 1-slot, 2-slots, 3-slots)
+            $bannersToSeed = [
+                'spring_2026' => [
+                    'banner' => [
+                        'name' => 'Spring Luxury 2026',
+                        'key' => 'spring_2026',
+                        'slug' => 'spring-2026-' . $storeId,
+                        'direction' => 'ltr',
+                        'is_active' => true,
+                        'aspect_ratio' => '21:9',
                         'border_radius' => '12px',
-                        'bg_color'      => '#f3f4f6',
+                        'bg_color' => '#f3f4f6',
                     ],
-                    "slots" => [
+                    'slots' => [
                         [
-                            'slot_key'   => 'left',
-                            'width'      => "65",
+                            'slot_key' => 'left',
+                            'width' => '65',
                             'is_visible' => true,
-                            'bg_color'   => '#ffffff',
-                            'elements'   => [
-                                'eyebrow'   => ['text' => 'EDITORIAL', 'color' => '#6b7280', 'visible' => true],
-                                'title'     => ['text' => 'The Spring Luxe Edit', 'color' => '#111827', 'visible' => true],
-                                'paragraph' => ['text' => 'Experience the intersection of comfort and sophistication with our latest seasonal release.', 'color' => '#4b5563', 'visible' => true],
-                                'button'    => ['text' => 'SHOP THE COLLECTION', 'bg_color' => '#111827', 'text_color' => '#ffffff', 'visible' => true],
+                            'bg_color' => '#ffffff',
+                            'elements' => [
+                                'eyebrow' => ['text' => 'EDITORIAL', 'color' => '#6b7280', 'visible' => true],
+                                'title' => ['text' => 'The Spring Luxe Edit', 'color' => '#111827', 'visible' => true],
+                                'paragraph' => ['text' => 'Experience the intersection of comfort and sophistication.', 'color' => '#4b5563', 'visible' => true],
+                                'button' => ['text' => 'SHOP NOW', 'bg_color' => '#111827', 'text_color' => '#ffffff', 'visible' => true],
                             ],
                         ],
                         [
-                            'slot_key'          => 'right',
-                            'width'             => "35",
-                            'is_visible'        => true,
-                            'image'             => 'https://images.pexels.com/photos/1039439/pexels-photo-1039439.jpeg?auto=compress&cs=tinysrgb&w=1200',
+                            'slot_key' => 'right',
+                            'width' => '35',
+                            'is_visible' => true,
+                            'image' => 'https://images.pexels.com/photos/1039439/pexels-photo-1039439.jpeg?auto=compress&cs=tinysrgb&w=1200',
+                        ],
+                    ],
+                ],
+                'flash_weekend' => [
+                    'banner' => [
+                        'name' => 'Flash Sale Weekend',
+                        'key' => 'flash_weekend',
+                        'slug' => 'flash-sale-weekend-' . $storeId,
+                        'direction' => 'ltr',
+                        'is_active' => true,
+                        'aspect_ratio' => '32:9',
+                        'border_radius' => '0px',
+                        'bg_color' => '#dc2626',
+                    ],
+                    'slots' => [
+                        [
+                            'slot_key' => 'left',
+                            'width' => '100',
+                            'is_visible' => true,
+                            'bg_color' => '#dc2626',
+                            'elements' => [
+                                'eyebrow' => ['text' => 'LIMITED TIME', 'color' => '#ffffff', 'visible' => true],
+                                'title' => ['text' => 'Weekend Flash: Up to 50% Off', 'color' => '#ffffff', 'visible' => true],
+                                'paragraph' => ['text' => 'Our biggest sale of the season is here. Selected items only.', 'color' => '#fee2e2', 'visible' => true],
+                                'button' => ['text' => 'SHOP THE SALE', 'bg_color' => '#ffffff', 'text_color' => '#dc2626', 'visible' => true],
+                            ],
+                        ],
+                    ],
+                ],
+                'season_lookbook' => [
+                    'banner' => [
+                        'name' => 'New Season Lookbook',
+                        'key' => 'season_lookbook',
+                        'slug' => 'season-lookbook-' . $storeId,
+                        'direction' => 'ltr',
+                        'is_active' => true,
+                        'aspect_ratio' => '16:9',
+                        'border_radius' => '24px',
+                        'bg_color' => '#f9fafb',
+                    ],
+                    'slots' => [
+                        [
+                            'slot_key' => 'left',
+                            'width' => '35',
+                            'is_visible' => true,
+                            'image' => 'https://images.pexels.com/photos/1183266/pexels-photo-1183266.jpeg?auto=compress&cs=tinysrgb&w=800',
+                        ],
+                        [
+                            'slot_key' => 'middle',
+                            'width' => '35',
+                            'is_visible' => true,
+                            'bg_color' => '#ffffff',
+                            'elements' => [
+                                'eyebrow' => ['text' => 'STREETWEAR', 'color' => '#6b7280', 'visible' => true],
+                                'title' => ['text' => 'Urban Essence', 'color' => '#111827', 'visible' => true],
+                                'paragraph' => ['text' => 'Bold designs for explorers.', 'color' => '#4b5563', 'visible' => true],
+                                'button' => ['text' => 'DISCOVER', 'bg_color' => '#111827', 'text_color' => '#ffffff', 'visible' => true],
+                            ],
+                        ],
+                        [
+                            'slot_key' => 'right',
+                            'width' => '35',
+                            'is_visible' => true,
+                            'image' => 'https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?auto=compress&cs=tinysrgb&w=800',
                         ],
                     ],
                 ],
             ];
 
             $seededBanners = [];
-            foreach ($bannersData as $item) {
-                $bannerData = $item['banner'];
-                $bannerData['store_id'] = $storeId;
-                $banner = Banner::updateOrCreate(
-                    ['store_id' => $storeId, 'key' => $bannerData['key']],
-                    $bannerData
+            foreach ($bannersToSeed as $key => $data) {
+                $banner = Banner::withoutGlobalScopes()->updateOrCreate(
+                    ['store_id' => $storeId, 'key' => $key],
+                    array_merge($data['banner'], ['store_id' => $storeId])
                 );
-                $seededBanners[$bannerData['key']] = $banner->id;
-                foreach ($item['slots'] as $slotData) {
+                
+                $seededBanners[$key] = $banner->id;
+
+                foreach ($data['slots'] as $slotData) {
                     if (isset($slotData['image'])) {
-                        $media = Media::create([
-                            'url' => $slotData['image'],
-                            'media_type' => 'image',
-                            'mediaable_type' => 'App\Models\Banner',
-                            'collection' => 'banner',
-                        ]);
+                        $media = Media::updateOrCreate(
+                            [
+                                'url' => $slotData['image'],
+                                'mediaable_type' => 'banner',
+                            ],
+                            [
+                                'media_type' => 'image',
+                                'mediaable_id' => $banner->id,
+                                'collection' => 'banner',
+                            ]
+                        );
                         $slotData['main_media_id'] = $media->id;
                         unset($slotData['image']);
                     }
+                    
                     $banner->slots()->updateOrCreate(
                         ['slot_key' => $slotData['slot_key']],
                         $slotData
@@ -192,6 +270,30 @@ class NewStoreDefaultsSeeder extends Seeder
                     'panel_title' => 'Jewelry Noir',
                     'panel_bg' => 'rgba(18,30,50,0.92)',
                     'order' => 1,
+                ],
+                [
+                    'image_url' => 'https://images.pexels.com/photos/1183266/pexels-photo-1183266.jpeg?auto=compress&cs=tinysrgb&w=1400',
+                    'tag' => 'Beauty Edit · Spring',
+                    'title' => "Ritual\nBeauty",
+                    'subtitle' => 'Skincare crafted for the discerning',
+                    'cta_text' => 'Shop Beauty',
+                    'cta_link' => '/collections/beauty',
+                    'panel_label' => 'Beauty Edit',
+                    'panel_title' => 'Ritual Beauty',
+                    'panel_bg' => 'rgba(22,40,28,0.92)',
+                    'order' => 2,
+                ],
+                [
+                    'image_url' => 'https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg?auto=compress&cs=tinysrgb&w=1400',
+                    'tag' => "Men's · New Season",
+                    'title' => "Tailored\nPrecision",
+                    'subtitle' => 'Refined menswear for the modern man',
+                    'cta_text' => 'Shop Men',
+                    'cta_link' => '/collections/mens',
+                    'panel_label' => "Men's",
+                    'panel_title' => 'Tailored Precision',
+                    'panel_bg' => 'rgba(38,18,26,0.92)',
+                    'order' => 3,
                 ],
             ];
 
@@ -274,7 +376,7 @@ class NewStoreDefaultsSeeder extends Seeder
 
             $seededCollections = [];
             foreach ($collectionsData as $cData) {
-                $collection = RuleBasedCollection::updateOrCreate(
+                $collection = RuleBasedCollection::withoutGlobalScopes()->updateOrCreate(
                     ['store_id' => $storeId, 'key' => $cData['key']],
                     array_merge($cData, ['store_id' => $storeId])
                 );
@@ -285,13 +387,15 @@ class NewStoreDefaultsSeeder extends Seeder
             $sections = [
                 ['id' => $seededBanners['spring_2026'] ?? null, 'type' => 'banner', 'order' => 1],
                 ['id' => $seededCollections['home.new_arrivals'] ?? null, 'type' => 'product_collection', 'order' => 2],
-                ['id' => $seededCollections['home.featured'] ?? null, 'type' => 'product_collection', 'order' => 3],
-                ['id' => $seededCollections['home.shoes'] ?? null, 'type' => 'product_collection', 'order' => 4],
+                ['id' => $seededBanners['flash_weekend'] ?? null, 'type' => 'banner', 'order' => 3],
+                ['id' => $seededCollections['home.featured'] ?? null, 'type' => 'product_collection', 'order' => 4],
+                ['id' => $seededBanners['season_lookbook'] ?? null, 'type' => 'banner', 'order' => 5],
+                ['id' => $seededCollections['home.shoes'] ?? null, 'type' => 'product_collection', 'order' => 6],
             ];
 
             foreach ($sections as $section) {
                 if ($section['id']) {
-                    HomeLayoutOrc::updateOrCreate(
+                    HomeLayoutOrc::withoutGlobalScopes()->updateOrCreate(
                         [
                             'store_id' => $storeId,
                             'sortable_id' => $section['id'],
@@ -304,9 +408,9 @@ class NewStoreDefaultsSeeder extends Seeder
 
             // 7. Seed 18 Default Products (6 per collection)
             $productTypes = [
-                ['badge' => $badgeMap['New'] ?? 2, 'cat' => 'Fashion', 'prefix' => 'New Arrival'],
-                ['badge' => $badgeMap['Featured'] ?? 6, 'cat' => 'Fashion', 'prefix' => 'Featured'],
-                ['badge' => $badgeMap['None'] ?? 1, 'cat' => 'Fashion', 'prefix' => 'Shoe'],
+                ['badge' => $badgeMap['New'] ?? null, 'cat' => 'Fashion', 'prefix' => 'New Arrival'],
+                ['badge' => $badgeMap['Featured'] ?? null, 'cat' => 'Fashion', 'prefix' => 'Featured'],
+                ['badge' => $badgeMap['None'] ?? null, 'cat' => 'Fashion', 'prefix' => 'Shoe'],
             ];
 
             $count = 1;
@@ -320,7 +424,7 @@ class NewStoreDefaultsSeeder extends Seeder
                             'description' => "This is a premium {$type['prefix']} product description for item #{$j}.",
                             'status' => 'published',
                             'ready_to_publish' => true,
-                            'is_featured' => $type['badge'] == ($badgeMap['Featured'] ?? 6),
+                            'is_featured' => $type['badge'] && $type['badge'] == ($badgeMap['Featured'] ?? -1),
                             'is_visible' => true,
                             'category_niche_id' => $categoryMap[$type['cat']] ?? null,
                             'badge_id' => $type['badge'],
@@ -342,7 +446,7 @@ class NewStoreDefaultsSeeder extends Seeder
                     Media::updateOrCreate(
                         [
                             'mediaable_id' => $product->id,
-                            'mediaable_type' => 'App\Models\Product',
+                            'mediaable_type' => 'product',
                             'collection' => 'thumbnail',
                         ],
                         [
@@ -364,7 +468,7 @@ class NewStoreDefaultsSeeder extends Seeder
 
             foreach ($promotions as $pData) {
                 Promotion::updateOrCreate(
-                    ['store_id' => $storeId, 'name' => $pData['name']],
+                    ['store_id' => $storeId, 'minimum_order_amount' => $pData['minimum_order_amount']],
                     array_merge($pData, [
                         'is_active' => true,
                         'valid_from' => now(),

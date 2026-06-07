@@ -9,9 +9,10 @@ return new class extends Migration {
     {
         Schema::create('rule_based_collections', function (Blueprint $table) {
             $table->id();
-            $table->string('key')->unique();
-            $table->string('name')->unique(); // e.g., 'deals', 'category'
-            $table->string('slug')->unique();
+            $table->foreignId('store_id')->nullable()->constrained()->onDelete('cascade');
+            $table->string('key');
+            $table->string('name'); // e.g., 'deals', 'category'
+            $table->string('slug');
             $table->string('icon')->nullable();
             // Core Configs
             $table->json('rules')->nullable();      // Your rules/logic
@@ -20,6 +21,9 @@ return new class extends Migration {
             
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+
+            $table->unique(['store_id', 'key']);
+            $table->unique(['store_id', 'slug']);
         });
     }
 

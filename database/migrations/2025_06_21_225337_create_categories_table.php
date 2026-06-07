@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('store_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('name');           // Category name
             $table->string('decription')->nullable();           // Category name
             $table->string('slug');
             $table->foreignId('parent_id')->nullable()->constrained('categories')->cascadeOnDelete(); // parentcategory / subcategory
-            $table->unique(['parent_id' , 'slug']);
             $table->timestamps();
+
+            $table->unique(['store_id', 'parent_id', 'slug']);
         });
     }
 

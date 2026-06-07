@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('coupons', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->unique(); // SUMMER2024, WELCOME10
+            $table->foreignId('store_id')->nullable()->constrained()->onDelete('cascade');
+            $table->string('code'); // SUMMER2024, WELCOME10
             $table->string('description')->nullable(); // "Summer sale discount"
             
             // Discount Type
@@ -42,6 +43,8 @@ return new class extends Migration
             $table->json('applicable_sub_category_ids')->nullable(); // [3, 7] - only these categories
             
             $table->timestamps();
+
+            $table->unique(['store_id', 'code']);
         });
     }
 

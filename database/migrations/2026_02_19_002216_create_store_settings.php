@@ -13,9 +13,12 @@ return new class extends Migration
     {
         Schema::create('store_settings', function (Blueprint $table) {
             $table->id();
-            $table->string('key')->unique();
+            $table->foreignId('store_id')->nullable()->constrained()->onDelete('cascade');
+            $table->string('key');
             $table->json('value');
             $table->timestamps();
+
+            $table->unique(['store_id', 'key']);
         });
     }
 

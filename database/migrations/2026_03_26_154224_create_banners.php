@@ -13,8 +13,9 @@ return new class extends Migration
     {
       Schema::create('banners', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('store_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('key')->index();
-            $table->string('slug')->unique();
+            $table->string('slug')->nullable();
             $table->string('name');
             $table->integer('order')->default(0)->index();
             $table->string('direction', 3)->default('ltr'); // 'ltr' or 'rtl'
@@ -24,7 +25,10 @@ return new class extends Migration
 
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-});
+
+            $table->unique(['store_id', 'key']);
+            $table->unique(['store_id', 'slug']);
+        });
     }
 
     /**
