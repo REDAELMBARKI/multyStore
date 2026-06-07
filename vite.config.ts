@@ -16,4 +16,11 @@ export default defineConfig({
             host: 'localhost',
         },
     },
+    optimizeDeps: {
+        // Force Vite to always re-bundle dependencies if they change
+        // This helps with the 504 Outdated Dep issue
+        entries: [
+            'resources/js/app.tsx',
+        ],
+    },
 });

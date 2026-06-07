@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use App\Events\OrderConfirmed;
 use App\Events\UserLogin;
-use App\Listeners\WelcomeNewAuthUsers;
+use App\Events\NewStoreCreation;
+
+use App\Listeners\SeedStoreDefaults;
 use App\Listeners\WelcomeBack;
 use App\Listeners\DecrementStock;
 use App\Listeners\HandleUserRegister;
@@ -20,6 +22,9 @@ class EventServiceProvider extends ServiceProvider
 {
 
     protected $listen = [
+            NewStoreCreation::class => [
+                  SeedStoreDefaults::class
+            ],
             OrderConfirmed::class => [
                 DecrementStock::class ,
                 NotifyAdmins::class ,

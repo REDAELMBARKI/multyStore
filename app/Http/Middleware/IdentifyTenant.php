@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use App\Models\Store;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\URL ;
 
 class IdentifyTenant
 {
@@ -21,32 +22,26 @@ class IdentifyTenant
         // Find the store by its unique domain signature
         $store = Store::where('domain', $host)->first();
         
-        // Set session domain to allow cross-subdomain sessions
-        $parts = explode('.', $host);
-        if (count($parts) >= 2) {
-            $baseDomain = implode('.', array_slice($parts, -2));
-            config(['session.domain' => '.' . $baseDomain]);
-        }
-
         if ($store) {
             $request->attributes->set('tenant_store', $store);
-            // Set global URL default for Laravel and Ziggy
-            // Use the host without the port for the parameter
-            \Illuminate\Support\Facades\URL::defaults(['tenant' => $host]);
-        }
-
-        $response = $next($request);
-
-        // Sync session after StartSession middleware has run
-        if ($store) {
+            
+            // Set session data. IdentifyTenant runs after StartSession (in append),
+            // so we can safely use the session helper here.
             session(['store_id' => $store->id]);
+            
+            // Set global URL default for Laravel and Ziggy
+            URL::defaults(['tenant' => $host]);
         } else {
             // Clear store_id if not on a tenant domain to prevent context leaking
             if (session()->has('store_id')) {
                 session()->forget('store_id');
             }
+
+            if (str_ends_with($host, ".localhost")) {
+                abort(404);
+            }
         }
 
-        return $response;
+        return $next($request);
     }
 }

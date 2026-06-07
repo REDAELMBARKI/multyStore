@@ -10,13 +10,14 @@ import {
   Menu as MenuIcon,
   MoreVertical,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 // Types
 interface SubLink {
   title: string;
   href: string;
   icon: typeof Home;
+  disabled?: boolean;
 }
 
 interface MenuItem {
@@ -34,9 +35,42 @@ interface MenuItem {
 // Color Palette
 
 export function Sidebar({ collapsed, setCollapsed }: { collapsed: boolean; setCollapsed: (val: boolean) => void }) {
-  const [expandedItem, setExpandedItem] = useState<string | null>('Dashboard');
   const { url } = usePage();
   const { theme: currentTheme } = useTheme();
+
+  // Initialize expanded item from localStorage or current URL
+  const [expandedItem, setExpandedItem] = useState<string | null>(() => {
+    const saved = localStorage.getItem('sidebar_expanded_item');
+    if (saved) return saved;
+
+    // Fallback: Find which parent has an active child based on the URL
+    const activeParent = menuItems.find(item => 
+      item.subLinks?.some(sub => sub.href && route().current(sub.href))
+    );
+    return activeParent ? activeParent.title : 'Dashboard';
+  });
+
+  // Save expanded item to localStorage
+  useEffect(() => {
+    if (expandedItem) {
+      localStorage.setItem('sidebar_expanded_item', expandedItem);
+    }
+  }, [expandedItem]);
+
+  // Ensure the correct section is expanded when the URL changes
+  useEffect(() => {
+    const activeParent = menuItems.find(item => 
+      item.subLinks?.some(sub => sub.href && route().current(sub.href))
+    );
+    if (activeParent && activeParent.title !== expandedItem) {
+      setExpandedItem(activeParent.title);
+    }
+  }, [url]);
+
+  // Persist collapsed state
+  useEffect(() => {
+    localStorage.setItem('sidebar_collapsed', JSON.stringify(collapsed));
+  }, [collapsed]);
 
   const toggleExpanded = (itemTitle: string) => {
     if (expandedItem === itemTitle) {

@@ -20,7 +20,12 @@ export function AdminLayout({ children }: { children: ReactNode }) {
 const AdminLayoutContent = ({ children }: { children: ReactNode }) => {
   const { isLoading } = useAuth();
   const { theme: currentTheme } = useTheme();
-  const [collapsed, setCollapsed] = useState(false); // ← lift state here
+  
+  // Initialize collapsed state from localStorage
+  const [collapsed, setCollapsed] = useState(() => {
+    const saved = localStorage.getItem('sidebar_collapsed');
+    return saved ? JSON.parse(saved) : false;
+  }); 
 
   // Map theme colors to CSS variables for Shadcn/UI components
   const themeStyles = {

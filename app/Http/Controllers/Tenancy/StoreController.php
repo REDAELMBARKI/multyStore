@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Tenancy;
 
+use App\Events\NewStoreCreation;
 use App\Http\Controllers\Controller;
 use App\Models\Store;
 use App\Models\Role;
@@ -15,15 +16,14 @@ class StoreController extends Controller
     /**
      * Display the central landing page or the store home page.
      */
-    public function index()
+    public function index(Request $request)
     {
         // If the middleware identified a store, we are in a tenant context
-        if (session()->has('store_id')) {
+        if ($request->attributes->has('tenant_store')) {
             // This is a store domain, show the shop front
-            return Inertia::render('Welcome');
+            return redirect()->route("dashboard.overview");
         }
 
-        // Otherwise, we are on the central hub (e.g., localhost)
         return Inertia::render('tenancy/home');
     }
 
@@ -69,6 +69,8 @@ class StoreController extends Controller
             'slug' => $validated['slug'],
         ]);
 
+        // set default store  config to shit store
+         Event(new NewStoreCreation());
         // Link current user to this store and make them super_admin
         $user = Auth::user();
         $user->store_id = $store->id;

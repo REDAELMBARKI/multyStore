@@ -8,13 +8,8 @@ use Inertia\Inertia;
 
 
 
-Route::middleware([
-    'web',
-    \App\Http\Middleware\HandleInertiaRequests::class,
-    ])->group(function () {
-        
-    Route::get('/', [StoreController::class, 'index'])->name('home');
-    
+Route::domain('localhost')->group(function () {
+    Route::get('/', [StoreController::class, 'index'])->name('home.tenancy');
     
     Route::get('/tenancy/dashboard', [TenenacyDashboardController::class , 'index'])->name('tenancy.dashboard');
 
@@ -26,11 +21,9 @@ Route::middleware([
         return Inertia::render('tenancy/roles/Index');
     })->name('tenancy.roles');
 
-
     // Tenancy Store Creation
     Route::middleware(['auth'])->group(function () {
         Route::get('/tenancy/stores/create', [StoreController::class, 'create'])->name('tenancy.stores.create');
         Route::post('/tenancy/stores', [StoreController::class, 'store'])->name('tenancy.stores.store');
     });
-
 });
