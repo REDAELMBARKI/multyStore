@@ -37,14 +37,16 @@ const Navbar = () => {
             </div>
           </div>
 
-          <div className="hidden md:block visible">
-            <a
-              href="#contact"
-              className="btn-primary w-full"
-            >
-              Contact
-            </a>
-          </div>
+                <div className="hidden md:block visible">
+          <a
+            href="http://192.168.1.4:8000"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary w-full"
+          >
+            Support WhatsApp
+          </a>
+        </div>
 
           <div className="md:hidden flex items-center">
             <button
