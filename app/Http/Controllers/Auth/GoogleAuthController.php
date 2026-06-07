@@ -65,8 +65,8 @@ class GoogleAuthController extends Controller
             $intendedUrl = null;
             
 
-            if(str_ends_with($host,'.localhost')){
-                $domain =    $user->store()?->domain ?? 'localhost';
+            if(str_ends_with($host,'.unistore.test') || str_ends_with($host, '.localhost')){
+                $domain =    $user->store()?->domain ?? $host;
                 $intendedUrl =  $domain . "/";
             }else{
 

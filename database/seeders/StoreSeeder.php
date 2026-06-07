@@ -17,12 +17,12 @@ class StoreSeeder extends Seeder
             [
                 'name' => 'Boutique Tech',
                 'slug' => 'boutique1',
-                'domain' => 'boutique1.localhost',
+                'domain' => 'boutique1.unistore.test',
             ],
             [
                 'name' => 'Fashion Store',
                 'slug' => 'boutique2',
-                'domain' => 'boutique2.localhost',
+                'domain' => 'boutique2.unistore.test',
             ],
         ];
 

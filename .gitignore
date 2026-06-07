@@ -42,19 +42,19 @@ secret.key
 encryption_cycle.log
 *.enc
 
-# Backend Logic Isolation\ remove these name the controolers and services expllicictly 
-app/Http/Controllers/*
-!app/Http/Controllers/Controller.php
-!app/Http/Controllers/Auth/
-!app/Http/Controllers/Tenancy/
-!app/Http/Controllers/RoleController.php
+# # Backend Logic Isolation\ remove these name the controolers and services expllicictly 
+# app/Http/Controllers/*
+# !app/Http/Controllers/Controller.php
+# !app/Http/Controllers/Auth/
+# !app/Http/Controllers/Tenancy/
+# !app/Http/Controllers/RoleController.php
 
 
-app/Services/*
+# app/Services/*
 
 
-app/Repositories/*
+# app/Repositories/*
 
 
-# # // frontend 
-resources/js/Pages/admin/*
+# # # // frontend 
+# resources/js/Pages/admin/*

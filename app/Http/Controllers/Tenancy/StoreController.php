@@ -36,7 +36,7 @@ class StoreController extends Controller
         // Get the last store index to generate default domain
         $lastStore = Store::latest('id')->first();
         $nextIndex = $lastStore ? $lastStore->id + 1 : 1;
-        $defaultDomain = "boutique{$nextIndex}.localhost";
+        $defaultDomain = "boutique{$nextIndex}.unistore.test";
 
         return Inertia::render('tenancy/stores/create', [
             'defaultDomain' => $defaultDomain,
@@ -59,7 +59,7 @@ class StoreController extends Controller
         if (empty($validated['domain'])) {
             $lastStore = Store::latest('id')->first();
             $nextIndex = $lastStore ? $lastStore->id + 1 : 1;
-            $validated['domain'] = "boutique{$nextIndex}.localhost";
+            $validated['domain'] = "boutique{$nextIndex}.unistore.test";
         }
 
         // Create the store

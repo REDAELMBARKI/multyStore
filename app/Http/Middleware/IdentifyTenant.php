@@ -19,6 +19,14 @@ class IdentifyTenant
     {
         $host = $request->getHost();
         
+        // Skip identification if we are on a known central domain
+        if (in_array($host, ['localhost', 'unistore.test'])) {
+            if (session()->has('store_id')) {
+                session()->forget('store_id');
+            }
+            return $next($request);
+        }
+
         // Find the store by its unique domain signature
         $store = Store::where('domain', $host)->first();
         
@@ -44,7 +52,7 @@ class IdentifyTenant
                 session()->forget('store_id');
             }
 
-            if (str_ends_with($host, ".localhost")) {
+            if (str_ends_with($host, ".unistore.test")) {
                 abort(404);
             }
         }

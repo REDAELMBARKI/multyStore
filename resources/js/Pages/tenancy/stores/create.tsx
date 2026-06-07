@@ -48,7 +48,7 @@ export default function CreateStore({ defaultDomain, nextIndex, auth }: Props) {
             setData(prev => ({
                 ...prev,
                 slug: generatedSlug,
-                domain: generatedSlug ? `${generatedSlug}.localhost` : defaultDomain
+                domain: generatedSlug ? `${generatedSlug}.unistore.test` : defaultDomain
             }));
         }
     }, [data.name]);
