@@ -39,14 +39,14 @@ class GoogleAuthController extends Controller
                 
             Log::info('Google Auth: Google user retrieved', ['email' => $googleUser->email]);
             
-            $user = User::where('email', $googleUser->email)->first();
+            $user = User::withoutGlobalScopes()->where('email', $googleUser->email)->first();
             
             if ($user) {
                 Log::info('Google Auth: User already exists, updating google_id');
                 $user->update(['google_id' => $googleUser->id]);
             } else {
                 Log::info('Google Auth: Creating new user');
-                $user = User::create([
+                $user = User::withoutGlobalScopes()->create([
                     'name' => $googleUser->name,
                     'email' => $googleUser->email,
                     'google_id' => $googleUser->id,

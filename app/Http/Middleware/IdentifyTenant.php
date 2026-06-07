@@ -17,44 +17,36 @@ class IdentifyTenant
     public function handle(Request $request, Closure $next): Response
     {
         $host = $request->getHost();
-        \Illuminate\Support\Facades\Log::info("IdentifyTenant: Handling host: {$host}");
         
-        // Find the store by its unique domain signature stored in the database
+        // Find the store by its unique domain signature
         $store = Store::where('domain', $host)->first();
-     
+        
+        // Set session domain to allow cross-subdomain sessions
+        $parts = explode('.', $host);
+        if (count($parts) >= 2) {
+            $baseDomain = implode('.', array_slice($parts, -2));
+            config(['session.domain' => '.' . $baseDomain]);
+        }
+
         if ($store) {
-            \Illuminate\Support\Facades\Log::info("IdentifyTenant: Store found: {$store->id}");
-            // 1. Force the APP_URL to be EXACTLY what the store's domain is
-            $scheme = $request->getScheme();
-            $port = $request->getPort();
-            $dynamicUrl = $scheme . '://' . $host . ($port ? ':' . $port : '');
-            
-            config(['app.url' => $dynamicUrl]);
+            $request->attributes->set('tenant_store', $store);
+            // Set global URL default for Laravel and Ziggy
+            // Use the host without the port for the parameter
+            \Illuminate\Support\Facades\URL::defaults(['tenant' => $host]);
+        }
 
-            // 2. Set the SESSION_DOMAIN to allow cross-subdomain sessions
-            $parts = explode('.', $host);
-            if (count($parts) >= 2) {
-                $baseDomain = implode('.', array_slice($parts, -2));
-                
-                // Special handling for localhost: browsers often don't like '.localhost'
-                if ($baseDomain === 'localhost') {
-                    config(['session.domain' => null]);
-                    \Illuminate\Support\Facades\Log::info("IdentifyTenant: Setting session domain to null (localhost)");
-                } else {
-                    config(['session.domain' => '.' . $baseDomain]);
-                    \Illuminate\Support\Facades\Log::info("IdentifyTenant: Setting session domain to: .{$baseDomain}");
-                }
-            }
+        $response = $next($request);
 
-            // 3. Mark this store as active in the session for the BelongsToStore trait
+        // Sync session after StartSession middleware has run
+        if ($store) {
             session(['store_id' => $store->id]);
         } else {
-            \Illuminate\Support\Facades\Log::warning("IdentifyTenant: No store found for host: {$host}");
-            if ($host === 'unistore.localhost') {
-                config(['app.url' => $request->getSchemeAndHttpHost()]);
+            // Clear store_id if not on a tenant domain to prevent context leaking
+            if (session()->has('store_id')) {
+                session()->forget('store_id');
             }
         }
 
-        return $next($request);
+        return $response;
     }
 }

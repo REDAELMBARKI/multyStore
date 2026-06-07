@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\Cart;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Tighten\Ziggy\Ziggy;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -34,6 +35,14 @@ class HandleInertiaRequests extends Middleware
         
         return [
             ...parent::share($request),
+             'ziggy' => function () use ($request) {
+                return array_merge((new Ziggy)->toArray(), [
+                    'location' => $request->url(),
+                    'defaults' => [
+                        'tenant' => $request->route('tenant') ?? $request->getHost()
+                    ],
+                ]);
+            },
             'auth' => [
                 'user' => $request->user() ? $request->user()->load('roles') : null,
             ],

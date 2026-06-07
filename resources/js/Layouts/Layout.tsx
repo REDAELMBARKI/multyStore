@@ -55,7 +55,7 @@ const LayoutContent = ({ children, currentPage, seo }: LayoutProps) => {
   const { flash, cartCount, cartItems: sharedCartItems, auth, storeCurrency } = props as any;
   const { addToast } = useToast();
   const { state: { currentTheme: theme } } = useStoreConfigCtx();
-
+ console.log("auth" , auth);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);

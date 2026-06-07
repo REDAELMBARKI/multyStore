@@ -47,17 +47,24 @@ export default function Login() {
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        <Input
-                            label="Email"
-                            type="email"
-                            placeholder="sellostore@company.com"
-                            value={data.email}
-                            onChange={(e) => setData('email', e.target.value)}
-                            error={errors.email}
-                            required
-                        />
+                        <div className="space-y-1">
+                            <Input
+                                label="Email"
+                                type="email"
+                                placeholder="sellostore@company.com"
+                                value={data.email}
+                                onChange={(e) => setData('email', e.target.value)}
+                                error={errors.email}
+                                required
+                            />
+                            {errors.email && (
+                                <div className="text-red-500 text-sm font-bold animate-bounce">
+                                    ⚠️ {errors.email}
+                                </div>
+                            )}
+                        </div>
 
-                        <div className="relative">
+                        <div className="relative space-y-1">
                             <Input
                                 label="Password"
                                 type={showPassword ? "text" : "password"}
@@ -67,6 +74,11 @@ export default function Login() {
                                 error={errors.password}
                                 required
                             />
+                            {errors.password && (
+                                <div className="text-red-500 text-sm font-bold animate-bounce">
+                                    ⚠️ {errors.password}
+                                </div>
+                            )}
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
