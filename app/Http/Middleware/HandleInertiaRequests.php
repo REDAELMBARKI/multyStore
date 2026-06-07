@@ -33,6 +33,13 @@ class HandleInertiaRequests extends Middleware
     {
         $settings = \App\Models\StoreSetting::all()->pluck('value', 'key')->toArray();
         
+        $user = $request->user();
+        \Log::debug('Inertia Share Auth', [
+            'has_user' => !!$user,
+            'user_id' => $user ? $user->id : null,
+            'session_id' => $request->session()->getId(),
+        ]);
+        
         return [
             ...parent::share($request),
              'ziggy' => function () use ($request) {

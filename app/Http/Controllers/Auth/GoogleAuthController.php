@@ -61,7 +61,19 @@ class GoogleAuthController extends Controller
             event(new \App\Events\UserLogin('auth', $user, true));
             Log::info('Google Auth: User logged in, session regenerated, and event dispatched');
 
-            $intendedUrl = session()->pull('url.intended', '/');
+            $host  = $request->getHost();
+            $intendedUrl = null;
+            
+
+            if(str_ends_with($host,'.localhost')){
+                $domain =    $user->store()?->domain ?? 'localhost';
+                $intendedUrl =  $domain . "/";
+            }else{
+
+                $intendedUrl = session()->pull('url.intended', '/');
+            }
+
+
             Log::info('Google Auth: Redirecting to intended URL', ['url' => $intendedUrl]);
             
             return redirect()->intended($intendedUrl);

@@ -34,14 +34,15 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
         $request->session()->regenerate();
         event(new UserLogin('auth' , Auth::user() , $request->remember));
-        Auth::user()->roles->pluck('name')->each(function($role){
-             if($role == "super_admin" || $role == "admin"){
+        
+        $user = Auth::user();
+        foreach ($user->roles as $role) {
+            if ($role->name === "super_admin" || $role->name === "admin") {
                 return redirect()->intended(route('dashboard.overview', absolute: false));
-             }
-            });
+            }
+        }
             
-         return redirect()->intended(route('home', absolute: false));
-
+        return redirect()->intended(route('home', absolute: false));
     }
 
     public function destroy(Request $request): RedirectResponse

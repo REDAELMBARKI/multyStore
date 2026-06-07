@@ -54,8 +54,14 @@ const LayoutContent = ({ children, currentPage, seo }: LayoutProps) => {
   const { props } = usePage();
   const { flash, cartCount, cartItems: sharedCartItems, auth, storeCurrency } = props as any;
   const { addToast } = useToast();
+  
   const { state: { currentTheme: theme } } = useStoreConfigCtx();
- console.log("auth" , auth);
+  
+  // Debug log to help identify if auth is missing or just the user is null
+  useEffect(() => {
+    console.log("Inertia Page Props:", props);
+    console.log("Auth Object:", auth);
+  }, [props, auth]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);

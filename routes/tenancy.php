@@ -26,4 +26,7 @@ Route::domain('localhost')->group(function () {
         Route::get('/tenancy/stores/create', [StoreController::class, 'create'])->name('tenancy.stores.create');
         Route::post('/tenancy/stores', [StoreController::class, 'store'])->name('tenancy.stores.store');
     });
+
+
+    
 });

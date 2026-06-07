@@ -31,6 +31,13 @@ class IdentifyTenant
             
             // Set global URL default for Laravel and Ziggy
             URL::defaults(['tenant' => $host]);
+            
+            \Log::debug('Tenant Identified', [
+                'host' => $host,
+                'store_id' => $store->id,
+                'session_id' => $request->session()->getId(),
+                'user_id' => $request->user() ? $request->user()->id : 'Guest'
+            ]);
         } else {
             // Clear store_id if not on a tenant domain to prevent context leaking
             if (session()->has('store_id')) {

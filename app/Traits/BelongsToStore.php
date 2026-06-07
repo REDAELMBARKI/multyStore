@@ -28,7 +28,13 @@ trait BelongsToStore
             }
 
             if ($storeId) {
-                $builder->where($builder->getQuery()->from . '.store_id', $storeId);
+                // Get the table name safely
+                $table = $builder->getModel()->getTable();
+                
+                $builder->where(function($query) use ($storeId, $table) {
+                    $query->where($table . '.store_id', $storeId)
+                          ->orWhereNull($table . '.store_id');
+                });
             }
         });
     }
