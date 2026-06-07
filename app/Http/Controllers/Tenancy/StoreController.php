@@ -69,8 +69,8 @@ class StoreController extends Controller
             'slug' => $validated['slug'],
         ]);
 
-        // set default store  config to shit store
-         Event(new NewStoreCreation());
+        // set default store config
+        event(new NewStoreCreation($store));
         // Link current user to this store and make them super_admin
         $user = Auth::user();
         $user->store_id = $store->id;

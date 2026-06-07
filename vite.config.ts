@@ -11,7 +11,9 @@ export default defineConfig({
         react(),
     ],
     server: {
-        host: 'localhost',
+        host: '0.0.0.0',
+        cors: true,
+        origin: 'http://localhost:5173',
         hmr: {
             host: 'localhost',
         },

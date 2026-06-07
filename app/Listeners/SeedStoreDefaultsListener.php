@@ -5,7 +5,10 @@ namespace App\Listeners;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class SeedStoreDefaults
+use App\Events\NewStoreCreation;
+use App\Jobs\SeedStoreDefaultsJob;
+
+class SeedStoreDefaultsListener
 {
     /**
      * Create the event listener.
@@ -18,8 +21,8 @@ class SeedStoreDefaults
     /**
      * Handle the event.
      */
-    public function handle(object $event): void
+    public function handle(NewStoreCreation $event): void
     {
-        
+        SeedStoreDefaultsJob::dispatch($event->store);
     }
 }

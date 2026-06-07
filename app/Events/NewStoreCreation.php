@@ -14,11 +14,14 @@ class NewStoreCreation
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public $store;
+
     /**
      * Create a new event instance.
      */
-    public function __construct()
+    public function __construct($store)
     {
+        $this->store = $store;
     }
 
     /**
