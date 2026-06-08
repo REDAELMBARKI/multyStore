@@ -1,13 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Menu, X, User, ChevronDown, LogOut, Store, Mail, LayoutDashboard } from "lucide-react";
 import { Link, usePage } from "@inertiajs/react";
-// @ts-ignore
-const route = window.route;
-
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { auth } = usePage().props as any;
+  // @ts-ignore
+  const route = window.route;
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const toggleMenu = () => {

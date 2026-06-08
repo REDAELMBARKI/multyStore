@@ -2,11 +2,10 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Rocket, LayoutDashboard } from 'lucide-react';
 import { Head, Link, usePage } from '@inertiajs/react';
-// @ts-ignore
-const route = window.route;
-
 const HeroSection = () => {
   const { auth } = usePage().props as any;
+  // @ts-ignore
+  const route = window.route;
   return (
     <div id="home" className="relative bg-gradient-to-b from-saas-black to-[#1c160c] overflow-hidden min-h-[90vh] flex items-center">
       {/* Orange glow effects */}

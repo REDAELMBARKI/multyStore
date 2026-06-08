@@ -24,6 +24,7 @@ class StoreController extends Controller
             return redirect()->route("dashboard.overview");
         }
 
+        // return Inertia::render('landingpage/Home');
         return Inertia::render('tenancy/home');
     }
 
@@ -31,7 +32,7 @@ class StoreController extends Controller
      * Show the form for creating a new store.
      */
     
-    public function create()
+     public function create()
     {
         // Get the last store index to generate default domain
         $lastStore = Store::latest('id')->first();

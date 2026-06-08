@@ -7,6 +7,7 @@ import { createRoot } from 'react-dom/client';
 import StoreConfigProvider from '@/contextProvoders/StoreConfigProvider';
 import { AdminThemeProvider } from '@/contextProvoders/AdminThemeProvider';
 import { ToastProvider } from '@/contextProvoders/ToastProvider';
+import { route } from 'ziggy-js';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -34,6 +35,13 @@ createInertiaApp({
     setup({ el, App, props }) {
         const root = createRoot(el);
         const storeConfigs = props.initialPage.props.storeConfigs;
+
+        // @ts-ignore
+        const ziggyConfig = props.initialPage.props.ziggy;
+        if (ziggyConfig) {
+            // @ts-ignore
+            window.route = (name, params, absolute, config = ziggyConfig) => route(name, params, absolute, config);
+        }
 
         root.render(   
             <StoreConfigProvider initialStoreConfigs={storeConfigs}>
