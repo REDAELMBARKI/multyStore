@@ -24,8 +24,8 @@ class StoreController extends Controller
             return redirect()->route("dashboard.overview");
         }
 
-        // return Inertia::render('landingpage/Home');
-        return Inertia::render('tenancy/home');
+        return Inertia::render('landingpage/Home');
+        // return Inertia::render('tenancy/home');
     }
 
     /**

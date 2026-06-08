@@ -49,7 +49,7 @@ Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])
 
 
 Route::domain('{tenant}')
-->where(['tenant' => '.+\.lvh\.me'])
+->where(['tenant' => '.*'])
 ->group(function () {
 
 
@@ -208,6 +208,7 @@ Route::delete('/media', [MediaController::class, 'destroyBulk'])
 // categories 
 Route::prefix('categories')->group(function(){
     Route::get('' , [CategoryController::class, 'index'])->name("categories.index");
+    Route::post('' , [CategoryController::class, 'store'])->name("categories.store");
     Route::get('/create' , [CategoryController::class, 'create'])->name("categories.create");
     Route::get('/tree' , [CategoryController::class, 'tree'])->name("categories.tree");
     Route::get('/{category:slug}' , [CategoryController::class, 'edit'])->name("categories.edit");
@@ -245,9 +246,9 @@ Route::get('/variants/sizes' , [VariantsController::class, 'sizes'])->name('vari
 // oderes
 // OrderManager
 Route::prefix('orders')->group(function(){
-    Route::get('' , [OrderController::class, 'index'])->middleware('auth')->name('orders.index') ;
+    Route::get('' , [OrderController::class, 'index'])->name('orders.index') ;
     // after checkout sucess
-    Route::get("/{order}/track" , [OrderController::class, 'authTrack'])->middleware('auth')->name('track.auth') ;
+    Route::get("/{order}/track" , [OrderController::class, 'authTrack'])->name('track.auth') ;
     Route::get('/track/{token}', [OrderController::class, 'guestTrack'])
         ->where('token', '[0-9a-f-]{36}')->name('track.guest') ;
 });
@@ -270,6 +271,7 @@ Route::prefix('reviews')->group(function(){
 // Roles
 Route::get('/roles', [RoleController::class, 'index'])->name('admin.roles.index');
 Route::post('/roles', [RoleController::class, 'store'])->name('admin.roles.store');
+Route::post('/roles/invite', [RoleController::class, 'invite'])->name('admin.roles.invite');
 Route::put('/roles/{role}', [RoleController::class, 'update'])->name('admin.roles.update');
 Route::delete('/roles/{role}', [RoleController::class, 'destroy'])->name('admin.roles.destroy');
 Route::post('/users/{user}/roles', [RoleController::class, 'assignRole'])->name('admin.users.assignRole');

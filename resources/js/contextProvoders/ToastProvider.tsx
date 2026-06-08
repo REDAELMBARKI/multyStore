@@ -2,7 +2,7 @@ import { ToastViewport } from "@/components/ui/ToastViewPort";
 import { ToastContext } from "@/context/ToastContext";
 import {  useCallback, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-
+import * as ToastPrimitives from "@radix-ui/react-toast"
 
 export interface ToastType {
   id?: string;
@@ -47,8 +47,10 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <ToastContext.Provider value={{ addToast, removeToast }}>
-      {children}
-      <ToastViewport toasts={toasts} onRemove={removeToast} />
+      <ToastPrimitives.Provider>
+        {children}
+        <ToastViewport toasts={toasts} onRemove={removeToast} />
+      </ToastPrimitives.Provider>
     </ToastContext.Provider>
   );
 }

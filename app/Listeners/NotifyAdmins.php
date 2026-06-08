@@ -16,24 +16,23 @@ class NotifyAdmins implements ShouldQueue
     use InteractsWithQueue, Queueable;
     public function handle(OrderConfirmed $event): void
     {
-        $admins = $this->getRecipients();
+        $admins = $this->getRecipients($event->order->store_id);
         
         foreach ($admins as $adminEmail) {
             Mail::to($adminEmail)
-                ->queue(new OrderConfirmedMail($event->order));
+                ->send(new OrderConfirmedMail($event->order));
         }
     }
 
-    public function getRecipients() : array {
-         $admins  = User::whereHas("roles" , function($q){
-               $q->whereIn("name" , ["super_admin" , "manager"]);
-         })->pluck('email');
+    public function getRecipients($storeId) : array {
+         $admins  = User::withoutGlobalScope('store')
+            ->where('store_id', $storeId)
+            ->whereHas("roles" , function($q){
+               $q->whereIn("name" , ["super_admin" , "admin", "manager"]);
+            })->pluck('email');
 
          if($admins->isNotEmpty() ){
-            return [
-                ...$admins->toArray() ,
-
-            ] ;
+            return $admins->toArray();
          }
          return [] ;
                     

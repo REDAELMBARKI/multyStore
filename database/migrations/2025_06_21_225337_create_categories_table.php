@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('store_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('name');           // Category name
-            $table->string('decription')->nullable();           // Category name
+            $table->text('description')->nullable();           // Category description
             $table->string('slug');
             $table->foreignId('parent_id')->nullable()->constrained('categories')->cascadeOnDelete(); // parentcategory / subcategory
             $table->timestamps();

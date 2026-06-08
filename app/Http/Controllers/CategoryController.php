@@ -60,15 +60,27 @@ class CategoryController extends Controller
             'id' => ['nullable' ,Rule::exists('categories' , 'id') ] ,
             'flag' => ['required' , Rule::in(['add-subs' , 'add-niches'])],
             'name' => ['required', 'string' , 'min:2'] ,
-            'description' => ['nullable' , 'string' , 'min:2'] ,
+            'description' => ['nullable' , 'string'] ,
             'nich_id' => [Rule::requiredIf(function() use ($request){
                 return $request->flag === 'add-subs' ;
-            })]
+            }), 'nullable', 'exists:categories,id']
         ]);
 
-         $category = $this->categoryService->storeCategory($request->validated());
-         if(!$category) return collect([]);
-         return $category ;
+         $data = $request->only(['id', 'name', 'description']);
+         
+         if ($request->flag === 'add-subs') {
+             $data['parent_id'] = $request->nich_id;
+         } else {
+             $data['parent_id'] = null;
+         }
+
+         $category = $this->categoryService->storeCategory($data);
+         
+         if ($request->wantsJson()) {
+             return response()->json($category);
+         }
+         
+         return back()->with('success', 'Category saved successfully.');
     }
 
   

@@ -39,13 +39,13 @@ class CategoryService
     public function storeCategory(array $data): Category {
         return Category::updateOrCreate(
         [
-            'id'      => $data['id'],
+            'id'      => $data['id'] ?? null,
         ]
             ,
         [
             'name'      => $data['name'],
             'parent_id' => $data['parent_id'] ?? null,
-            'desciption' => $data['description'] ,
+            'description' => $data['description'] ?? null,
             'slug'      => Str::slug($data['name']),
         ]);
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Invitation;
+use App\Events\UserInvited;
 use App\Mail\RoleInvitationMail;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -54,7 +55,7 @@ class RoleController extends Controller
                 'expires_at' => now()->addDays(7),
             ]);
             
-            Mail::to($validated['email'])->send(new RoleInvitationMail($invitation));
+            event(new UserInvited($invitation));
         }
 
         return back()->with('success', 'Role created successfully.');
@@ -90,7 +91,7 @@ class RoleController extends Controller
             'expires_at' => now()->addDays(7),
         ]);
 
-        Mail::to($validated['email'])->send(new RoleInvitationMail($invitation));
+        event(new UserInvited($invitation));
 
         return back()->with('success', 'Invitation sent successfully.');
     }

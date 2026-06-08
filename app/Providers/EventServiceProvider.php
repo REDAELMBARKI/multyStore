@@ -6,6 +6,8 @@ use App\Events\OrderConfirmed;
 use App\Events\UserLogin;
 use App\Events\NewStoreCreation;
 
+use App\Events\UserInvited;
+use App\Listeners\SendInvitationEmail;
 use App\Listeners\SeedStoreDefaultsListener;
 use App\Listeners\DecrementStock;
 use App\Listeners\HandleUserRegister;
@@ -33,6 +35,9 @@ class EventServiceProvider extends ServiceProvider
             ] ,
             Registered::class => [
                 HandleUserRegister::class
+            ],
+            UserInvited::class => [
+                SendInvitationEmail::class
             ]
             ];
     

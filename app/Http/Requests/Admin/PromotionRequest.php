@@ -28,7 +28,7 @@ class PromotionRequest extends FormRequest
             'valid_from' => 'nullable|date',
             'valid_until' => 'nullable|date|after_or_equal:valid_from',
             'is_active' => 'required|boolean',
-            'priority' => 'required|integer',
+            'max_discount_amount' => 'nullable|numeric|min:0',
         ];
     }
 }

@@ -32,7 +32,7 @@ interface Promotion {
   valid_from: string | null;
   valid_until: string | null;
   is_active: boolean;
-  priority: number;
+  max_discount_amount: number | null;
 }
 
 interface Props {
@@ -58,7 +58,7 @@ export default function Create() {
     valid_from: format(initialStartDate, "yyyy-MM-dd HH:mm:ss"),
     valid_until: format(initialEndDate, "yyyy-MM-dd HH:mm:ss"),
     is_active: promotion?.is_active ?? true,
-    priority: promotion?.priority ?? 0,
+    max_discount_amount: promotion?.max_discount_amount || null,
   });
 
   const [startDate, setStartDate] = useState<Date | undefined>(initialStartDate);
@@ -198,28 +198,6 @@ export default function Create() {
                     </div>
                   </div>
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="priority" style={{ color: theme.text }}>Priority</Label>
-                  <div className="flex items-center gap-4">
-                    <Input
-                      id="priority"
-                      type="number"
-                      className="w-32 transition-all focus:ring-2"
-                      style={{ 
-                        background: theme.bg, 
-                        border: `2px solid ${theme.border}`,
-                        color: theme.text
-                      }}
-                      value={data.priority}
-                      onChange={e => setData('priority', parseInt(e.target.value))}
-                    />
-                    <p className="text-xs" style={{ color: theme.textMuted }}>
-                      Higher priority promotions will be applied first if multiple qualify.
-                    </p>
-                  </div>
-                  {errors.priority && <p className="text-xs font-medium" style={{ color: theme.error }}>{errors.priority}</p>}
-                </div>
               </CardContent>
             </Card>
 
@@ -287,6 +265,36 @@ export default function Create() {
                         </span>
                       </div>
                       {errors.value && <p className="text-xs font-medium" style={{ color: theme.error }}>{errors.value}</p>}
+                    </div>
+                  )}
+
+                  {data.type === 'percentage' && (
+                    <div className="space-y-2">
+                      <Label htmlFor="max_discount_amount" style={{ color: theme.text }}>Maximum Discount Amount (Optional)</Label>
+                      <div className="relative">
+                        <Input
+                          id="max_discount_amount"
+                          type="number"
+                          step="0.01"
+                          placeholder="0.00"
+                          className="pr-16 transition-all focus:ring-2"
+                          style={{ 
+                            background: theme.bg, 
+                            border: `2px solid ${theme.border}`,
+                            color: theme.text
+                          }}
+                          value={data.max_discount_amount || ''}
+                          onChange={e => setData('max_discount_amount', e.target.value ? parseFloat(e.target.value) : null)}
+                        />
+                        <span 
+                          className="absolute right-3 top-1/2 -translate-y-1/2 font-bold px-2 py-1 rounded"
+                          style={{ background: theme.bgSecondary, color: theme.primary, fontSize: '0.75rem' }}
+                        >
+                          MAD
+                        </span>
+                      </div>
+                      {errors.max_discount_amount && <p className="text-xs font-medium" style={{ color: theme.error }}>{errors.max_discount_amount}</p>}
+                      <p className="text-xs" style={{ color: theme.textMuted }}>Limit the maximum discount value for percentage-based promotions.</p>
                     </div>
                   )}
                 </div>

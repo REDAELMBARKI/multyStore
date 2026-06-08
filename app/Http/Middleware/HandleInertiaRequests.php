@@ -43,18 +43,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'ziggy' => function () use ($request, $user) {
-                $tenant = $request->route('tenant') ?? $user?->store?->domain;
-                
-                // If we still don't have a tenant, only use host if it's not a central domain
-                if (!$tenant) {
-                    $host = $request->getHost();
-                    if (!in_array($host, ['localhost', 'lvh.me'])) {
-                        $tenant = $host;
-                    } else {
-                        // Default to lvh.me for links from central to tenant if no user store is found
-                        $tenant = 'lvh.me';
-                    }
-                }
+                $tenant = $request->route('tenant') ?? ($user?->store?->domain ?? $request->getHost());
 
                 return array_merge((new Ziggy)->toArray(), [
                     'location' => $request->url(),
