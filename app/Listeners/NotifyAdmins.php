@@ -13,29 +13,29 @@ use Illuminate\Support\Facades\Mail;
 
 class NotifyAdmins implements ShouldQueue
 {
-    use InteractsWithQueue ;
+    use InteractsWithQueue, Queueable;
     public function handle(OrderConfirmed $event): void
     {
-        $admins = $this->getRecipients() ;
-        Mail::to(config('Mail.from'))
-            ->bcc($admins)
-            ->queue(new OrderConfirmedMail($event->order));
+        $admins = $this->getRecipients();
+        
+        foreach ($admins as $adminEmail) {
+            Mail::to($adminEmail)
+                ->queue(new OrderConfirmedMail($event->order));
+        }
     }
 
     public function getRecipients() : array {
-         $superAdmin  = User::where("role" , "super")->pluck('email');
-         $admins = User::join('user_role','user_role.user_id' , '=' , "users.id")
-                   ->where("user_role.should_notify" , true)
-                   ->pluck('users.email')
-                   ;
+         $admins  = User::whereHas("roles" , function($q){
+               $q->whereIn("name" , ["super_admin" , "manager"]);
+         })->pluck('email');
+
          if($admins->isNotEmpty() ){
             return [
                 ...$admins->toArray() ,
-                ...$superAdmin->toArray()
 
             ] ;
          }
-         return $superAdmin->toArray() ;
+         return [] ;
                     
     }
 }

@@ -11,14 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Add claims to roles
-        Schema::table('roles', function (Blueprint $table) {
-            if (!Schema::hasColumn('roles', 'claims')) {
-                $table->json('claims')->nullable()->after('name');
-            }
-        });
-
-        // Update invitations table
+    
         Schema::table('invitations', function (Blueprint $table) {
             if (!Schema::hasColumn('invitations', 'email')) {
                 $table->string('email')->after('id');

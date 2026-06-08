@@ -23,7 +23,7 @@ class CouponFactory extends Factory
             : null;
 
         return [
-            'store_id'                    => Store::factory(),
+            'store_id'                    => Store::inRandomOrder()->first()->id,
             'code'                        => strtoupper($this->faker->unique()->lexify('????') . $this->faker->numberBetween(5, 75)),
             'description'                 => $this->faker->optional()->sentence(),
             'type'                        => $type,

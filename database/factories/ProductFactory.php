@@ -13,7 +13,7 @@ class ProductFactory extends Factory
     public function definition(): array
 {
     return [
-        'store_id'          => Store::factory(),
+        'store_id'          => Store::inRandomOrder()->first()?->id ?? 1,
         'name'              => $this->faker->words(4, true),
         'brand'             => $this->faker->company(),
         'product_attributes' => [

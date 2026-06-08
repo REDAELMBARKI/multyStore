@@ -11,13 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('stores', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string("domain");
-            $table->string('slug')->unique();
-            $table->timestamps();
-        });
+        // Handled in the base migration
     }
 
     /**
@@ -25,6 +19,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('stores');
+        Schema::table('store_settings', function (Blueprint $table) {
+            $table->dropUnique(['store_id', 'key']);
+            $table->unique('key');
+        });
     }
 };

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Minus, Plus, ShoppingCart } from 'lucide-react';
+import { usePage } from '@inertiajs/react';
 
 const AddToCartSection = ({ stock, price, onAddToCart }) => {
   const [quantity, setQuantity] = useState(1);
+  const { storeCurrency } = usePage().props;
 
   const handleQuantityChange = (change) => {
     const newQuantity = quantity + change;
@@ -37,7 +39,7 @@ const AddToCartSection = ({ stock, price, onAddToCart }) => {
 
       {/* Price */}
       <div className="text-3xl font-bold text-gray-900">
-        ${price.toFixed(2)}
+        {price.toFixed(2)} {storeCurrency}
       </div>
 
       {/* Quantity and Add to Cart */}

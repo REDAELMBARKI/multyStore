@@ -156,7 +156,22 @@ return [
     |
     */
 
-    'domain' => env('SESSION_DOMAIN'),
+    'domain' => env('SESSION_DOMAIN', (function() {
+        if (isset($_SERVER['HTTP_HOST'])) {
+            $host = $_SERVER['HTTP_HOST'];
+            // Remove port if present
+            $host = explode(':', $host)[0];
+            
+            if (str_ends_with($host, '.localhost') || $host === 'localhost') {
+                return '.localhost';
+            }
+            
+            if (str_ends_with($host, '.unistore.test') || $host === 'unistore.test') {
+                return '.unistore.test';
+            }
+        }
+        return null;
+    })()),
 
     /*
     |--------------------------------------------------------------------------

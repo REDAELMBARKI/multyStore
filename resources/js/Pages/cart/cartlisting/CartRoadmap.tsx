@@ -2,6 +2,7 @@ import React from 'react';
 import { CheckCircle2, Gift, Truck, X } from "lucide-react";
 import { ThemePalette } from "@/types/ThemeTypes";
 import { Milestone } from "./CartPage";
+import { usePage } from "@inertiajs/react";
 
 interface CartRoadmapProps {
     subtotal: number;
@@ -11,6 +12,7 @@ interface CartRoadmapProps {
 }
 
 export default function CartRoadmap({ subtotal, milestones, theme, onClose }: CartRoadmapProps) {
+    const { storeCurrency } = usePage().props as any;
     if (milestones.length === 0) return null;
 
     const reachedCount = milestones.filter(m => subtotal >= m.goal).length;
@@ -77,7 +79,7 @@ export default function CartRoadmap({ subtotal, milestones, theme, onClose }: Ca
                                             color: isReached ? theme.success : theme.textMuted 
                                         }}
                                     >
-                                        {m.goal.toLocaleString()} MAD
+                                        {m.goal.toLocaleString()} {storeCurrency}
                                     </span>
                                 </div>
 

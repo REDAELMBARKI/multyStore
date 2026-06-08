@@ -1,6 +1,7 @@
 // Pages/Cart/components/CartItemRow.tsx
 import { ThemePalette } from "@/types/ThemeTypes";
 import { Plus, Minus } from "lucide-react";
+import { usePage } from "@inertiajs/react";
 
 interface CartItemRowProps {
     item: any;
@@ -15,6 +16,7 @@ export default function CartItemRow({
     onQuantityChange,
     onRemoveItem,
 }: CartItemRowProps) {
+    const { storeCurrency } = usePage().props as any;
     return (
         <div
             style={{
@@ -107,7 +109,7 @@ export default function CartItemRow({
             {/* Price */}
             <div className="col-span-2 text-center">
                 <span style={{ color: theme.text }} className="font-semibold">
-                    ${item.price_snapshot}
+                    {item.price_snapshot} {storeCurrency}
                 </span>
             </div>
 
@@ -159,7 +161,7 @@ export default function CartItemRow({
             {/* Item Total */}
             <div className="col-span-2 text-right">
                 <span style={{ color: theme.text }} className="font-bold">
-                    ${(item.price_snapshot * item.quantity)}
+                    {(item.price_snapshot * item.quantity)} {storeCurrency}
                 </span>
             </div>
         </div>

@@ -3,11 +3,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use \App\Traits\BelongsToStore ;
 class Order extends Model
 {
     /** @use HasFactory<\Database\Factories\OrderFactory> */
-    use HasFactory, \App\Traits\BelongsToStore;
+    use HasFactory, BelongsToStore;
     protected $fillable = [
         'store_id',
         'order_number',

@@ -10,4 +10,19 @@ export default defineConfig({
         }),
         react(),
     ],
+    server: {
+        host: '0.0.0.0',
+        cors: true,
+        origin: 'http://localhost:5173',
+        hmr: {
+            host: 'localhost',
+        },
+    },
+    optimizeDeps: {
+        // Force Vite to always re-bundle dependencies if they change
+        // This helps with the 504 Outdated Dep issue
+        entries: [
+            'resources/js/app.tsx',
+        ],
+    },
 });

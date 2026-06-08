@@ -13,10 +13,13 @@ return new class extends Migration
     {
         Schema::create('badges', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
+            $table->foreignId('store_id')->nullable()->constrained()->onDelete('cascade');
+            $table->string('name');
             $table->string('color');
             $table->string('icon');
             $table->timestamps();
+
+            $table->unique(['store_id', 'name']);
         });
     }
 

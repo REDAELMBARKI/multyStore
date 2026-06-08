@@ -32,7 +32,7 @@ class CategoryFactory extends Factory
         return [
             "name"=> $this->faker->name,
             "slug"=> $this->faker->slug,
-            'store_id' => Store::factory(),
+            'store_id' => Store::inRandomOrder()->first()?->id ?? 1,
         ];
     }
 }

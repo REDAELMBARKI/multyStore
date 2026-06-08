@@ -1,10 +1,10 @@
 // Pages/Checkout/components/OrderSummaryCard.tsx
 import { ThemePalette } from "@/types/ThemeTypes";
 import { Lock, Tag } from "lucide-react";
+import { usePage } from "@inertiajs/react";
 
 interface OrderSummaryCardProps {
     subtotal: number;
-
     tax: number;
     total: number;
     discount?: number;
@@ -34,6 +34,7 @@ export default function OrderSummaryCard({
     applyCouponWithFeedback , 
     zone
 }: OrderSummaryCardProps) {
+    const { storeCurrency } = usePage().props as any;
     return (
         <div
             style={{
@@ -58,7 +59,7 @@ export default function OrderSummaryCard({
                         Subtotal ({itemCount} item{itemCount !== 1 ? "s" : ""}):
                     </span>
                     <span style={{ color: theme.text }} className="font-semibold">
-                        ${subtotal}
+                        {subtotal} {storeCurrency}
                     </span>
                 </div>
 
@@ -76,7 +77,7 @@ export default function OrderSummaryCard({
                                 <span className="text-xs">✓</span>
                             </span>
                         ) : (
-                            `$${zone?.price}`
+                            `${zone?.price} ${storeCurrency}`
                         )}
                     </span>
                 </div>
@@ -90,7 +91,7 @@ export default function OrderSummaryCard({
                         }}
                         className="text-xs p-2 mt-2"
                     >
-                        Add ${(50 - subtotal)} more for FREE shipping!
+                        Add {(50 - subtotal)} {storeCurrency} more for FREE shipping!
                     </div>
                 )}
 
@@ -99,15 +100,20 @@ export default function OrderSummaryCard({
                         Tax (10%):
                     </span>
                     <span style={{ color: theme.text }} className="font-semibold">
-                        ${tax}
+                        {tax} {storeCurrency}
                     </span>
                 </div>
 
-                {discount < 0 && (
+                {discount > 0 && (
                     <div className="flex justify-between text-sm">
-                        <span style={{ color: theme.success }}>Discount:</span>
-                        <span style={{ color: theme.success }} className="font-semibold">
-                            ${discount}
+                        <span style={{ color: theme.success }}>
+                            Discount:
+                        </span>
+                        <span
+                            style={{ color: theme.success }}
+                            className="font-semibold"
+                        >
+                            - {discount} {storeCurrency}
                         </span>
                     </div>
                 )}
@@ -156,20 +162,20 @@ export default function OrderSummaryCard({
             {/* Total */}
             <div
                 style={{ borderColor: theme.border }}
-                className="border-t pt-4 mb-4"
+                className="border-t pt-4 mb-6"
             >
                 <div className="flex justify-between items-center">
                     <span
                         style={{ color: theme.text }}
-                        className="font-bold text-lg"
+                        className="text-lg font-bold"
                     >
-                        TOTAL:
+                        Total:
                     </span>
                     <span
                         style={{ color: theme.primary }}
-                        className="font-bold text-2xl"
+                        className="text-2xl font-black"
                     >
-                        ${total}
+                        {total} {storeCurrency}
                     </span>
                 </div>
             </div>

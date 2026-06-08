@@ -34,8 +34,15 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
         $request->session()->regenerate();
         event(new UserLogin('auth' , Auth::user() , $request->remember));
-        return redirect()->intended(route('dashboard.overview', absolute: false));
-
+        
+        $user = Auth::user();
+        foreach ($user->roles as $role) {
+            if ($role->name === "super_admin" || $role->name === "admin") {
+                return redirect()->intended(route('dashboard.overview', absolute: false));
+            }
+        }
+            
+        return redirect()->intended(route('home', absolute: false));
     }
 
     public function destroy(Request $request): RedirectResponse

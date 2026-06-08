@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\Cart;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Tighten\Ziggy\Ziggy;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -32,8 +33,23 @@ class HandleInertiaRequests extends Middleware
     {
         $settings = \App\Models\StoreSetting::all()->pluck('value', 'key')->toArray();
         
+        $user = $request->user();
+        \Log::debug('Inertia Share Auth', [
+            'has_user' => !!$user,
+            'user_id' => $user ? $user->id : null,
+            'session_id' => $request->session()->getId(),
+        ]);
+        
         return [
             ...parent::share($request),
+             'ziggy' => function () use ($request) {
+                return array_merge((new Ziggy)->toArray(), [
+                    'location' => $request->url(),
+                    'defaults' => [
+                        'tenant' => $request->route('tenant') ?? $request->getHost()
+                    ],
+                ]);
+            },
             'auth' => [
                 'user' => $request->user() ? $request->user()->load('roles') : null,
             ],
@@ -58,6 +74,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'cartCount' => $request->user() ? Cart::where('user_id', $request->user()->id)->sum('quantity') : 0,
             'cartItems' => $request->user() ? app(\App\Services\CartService::class)->getCartItems(false) : [],
+            'storeCurrency' => app(\App\Services\StoreSettingService::class)->getStoreCurrency(),
         ];
     }
 }

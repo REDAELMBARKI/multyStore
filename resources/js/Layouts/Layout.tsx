@@ -52,10 +52,16 @@ const Layout = ({ children, currentPage = 'home', seo }: LayoutProps) => {
 
 const LayoutContent = ({ children, currentPage, seo }: LayoutProps) => {
   const { props } = usePage();
-  const { flash, cartCount, cartItems: sharedCartItems, auth } = props as any;
+  const { flash, cartCount, cartItems: sharedCartItems, auth, storeCurrency } = props as any;
   const { addToast } = useToast();
+  
   const { state: { currentTheme: theme } } = useStoreConfigCtx();
-
+  
+  // Debug log to help identify if auth is missing or just the user is null
+  useEffect(() => {
+    console.log("Inertia Page Props:", props);
+    console.log("Auth Object:", auth);
+  }, [props, auth]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -111,7 +117,7 @@ const LayoutContent = ({ children, currentPage, seo }: LayoutProps) => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-10 text-sm">
               <div style={{ color: theme.textSecondary }}>
-                Free shipping for standard order over $100
+                Free shipping for standard order over 100 {storeCurrency}
               </div>
               <div className="hidden md:flex space-x-6" style={{ color: theme.textSecondary }}>
                 <a href="#" className="transition-colors hover:opacity-80">Help & FAQs</a>

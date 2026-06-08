@@ -29,7 +29,7 @@ class OrderConfirmedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from : new Address(config('mail' , "other email address ")) ,
+            from : new Address(config('mail.from.address'), config('mail.from.name')),
             subject: 'Order Confirmed Mail',
         );
     }
@@ -40,7 +40,7 @@ class OrderConfirmedMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'emails.order-confirmed',
         );
     }
 

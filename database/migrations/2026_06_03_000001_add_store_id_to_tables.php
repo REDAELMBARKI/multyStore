@@ -33,13 +33,15 @@ return new class extends Migration
             'invitations',
             'home_layout_orcs',
             'product_attributes',
-            'materials',
             'google_sheets'
         ];
 
         foreach ($tables as $tableName) {
-            Schema::table($tableName, function (Blueprint $table) {
-                $table->foreignId('store_id')->nullable()->constrained()->onDelete('cascade');
+            Schema::table($tableName, function (Blueprint $table) use ($tableName) {
+                // Only add store_id if it doesn't already exist from the base migration
+                if (!Schema::hasColumn($tableName, 'store_id')) {
+                    $table->foreignId('store_id')->nullable()->constrained()->onDelete('cascade');
+                }
             });
         }
     }

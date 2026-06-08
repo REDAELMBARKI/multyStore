@@ -17,9 +17,14 @@ export default function Register() {
         password_confirmation: '',
     });
 
+    console.log('Validation Errors:', errors);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('register.store'));
+        post(route('register.store'), {
+            onFinish: () => console.log('Submission finished'),
+            onError: (err) => console.log('Submission Error:', err),
+        });
     };
 
     return (
@@ -79,28 +84,42 @@ export default function Register() {
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-5">
-                        <Input
-                            label="Full Name"
-                            type="text"
-                            placeholder="Roger Gerrard"
-                            value={data.name}
-                            onChange={(e) => setData('name', e.target.value)}
-                            error={errors.name}
-                            required
-                        />
+                        <div className="space-y-1">
+                            <Input
+                                label="Full Name"
+                                type="text"
+                                placeholder="Roger Gerrard"
+                                value={data.name}
+                                onChange={(e) => setData('name', e.target.value)}
+                                error={errors.name}
+                                required
+                            />
+                            {errors.name && (
+                                <div className="text-red-500 text-sm font-bold animate-bounce">
+                                    ⚠️ {errors.name}
+                                </div>
+                            )}
+                        </div>
 
-                        <Input
-                            label="Email"
-                            type="email"
-                            placeholder="sellostore@company.com"
-                            value={data.email}
-                            onChange={(e) => setData('email', e.target.value)}
-                            error={errors.email}
-                            required
-                        />
+                        <div className="space-y-1">
+                            <Input
+                                label="Email"
+                                type="email"
+                                placeholder="sellostore@company.com"
+                                value={data.email}
+                                onChange={(e) => setData('email', e.target.value)}
+                                error={errors.email}
+                                required
+                            />
+                            {errors.email && (
+                                <div className="text-red-500 text-sm font-bold animate-bounce">
+                                    ⚠️ {errors.email}
+                                </div>
+                            )}
+                        </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="relative">
+                            <div className="relative space-y-1">
                                 <Input
                                     label="Password"
                                     type={showPassword ? "text" : "password"}
@@ -110,6 +129,11 @@ export default function Register() {
                                     error={errors.password}
                                     required
                                 />
+                                {errors.password && (
+                                    <div className="text-red-500 text-sm font-bold animate-bounce">
+                                        ⚠️ {errors.password}
+                                    </div>
+                                )}
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}

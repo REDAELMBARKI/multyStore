@@ -11,9 +11,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
 
   return<>
         <AuthProvider>
-          <AdminThemeProvider>
             <AdminLayoutContent children={children} />
-          </AdminThemeProvider>
         </AuthProvider>
   </>
 }
@@ -22,10 +20,38 @@ export function AdminLayout({ children }: { children: ReactNode }) {
 const AdminLayoutContent = ({ children }: { children: ReactNode }) => {
   const { isLoading } = useAuth();
   const { theme: currentTheme } = useTheme();
-  const [collapsed, setCollapsed] = useState(false); // ← lift state here
+  
+  // Initialize collapsed state from localStorage
+  const [collapsed, setCollapsed] = useState(() => {
+    const saved = localStorage.getItem('sidebar_collapsed');
+    return saved ? JSON.parse(saved) : false;
+  }); 
+
+  // Map theme colors to CSS variables for Shadcn/UI components
+  const themeStyles = {
+    '--background': currentTheme.bg,
+    '--foreground': currentTheme.text,
+    '--card': currentTheme.card,
+    '--card-foreground': currentTheme.text,
+    '--popover': currentTheme.modal,
+    '--popover-foreground': currentTheme.text,
+    '--primary': currentTheme.primary,
+    '--primary-foreground': currentTheme.textInverse,
+    '--secondary': currentTheme.secondary,
+    '--secondary-foreground': currentTheme.text,
+    '--muted': currentTheme.bgSecondary,
+    '--muted-foreground': currentTheme.textMuted,
+    '--accent': currentTheme.accent,
+    '--accent-foreground': currentTheme.textInverse,
+    '--destructive': currentTheme.error,
+    '--destructive-foreground': currentTheme.textInverse,
+    '--border': currentTheme.border,
+    '--input': currentTheme.border,
+    '--ring': currentTheme.accent,
+  } as React.CSSProperties;
 
   return (
-    <div className="flex h-dvh overflow-hidden">
+    <div className="flex h-dvh overflow-hidden" style={themeStyles}>
 
       {/* ← dynamic width instead of hardcoded w-64 */}
       <div style={{

@@ -39,14 +39,14 @@ class GoogleAuthController extends Controller
                 
             Log::info('Google Auth: Google user retrieved', ['email' => $googleUser->email]);
             
-            $user = User::where('email', $googleUser->email)->first();
+            $user = User::withoutGlobalScopes()->where('email', $googleUser->email)->first();
             
             if ($user) {
                 Log::info('Google Auth: User already exists, updating google_id');
                 $user->update(['google_id' => $googleUser->id]);
             } else {
                 Log::info('Google Auth: Creating new user');
-                $user = User::create([
+                $user = User::withoutGlobalScopes()->create([
                     'name' => $googleUser->name,
                     'email' => $googleUser->email,
                     'google_id' => $googleUser->id,
@@ -61,7 +61,19 @@ class GoogleAuthController extends Controller
             event(new \App\Events\UserLogin('auth', $user, true));
             Log::info('Google Auth: User logged in, session regenerated, and event dispatched');
 
-            $intendedUrl = session()->pull('url.intended', '/');
+            $host  = $request->getHost();
+            $intendedUrl = null;
+            
+
+            if(str_ends_with($host,'.lvh.me') || str_ends_with($host, '.localhost')){
+                $domain =    $user->store()?->domain ?? $host;
+                $intendedUrl =  $domain . "/";
+            }else{
+
+                $intendedUrl = session()->pull('url.intended', '/');
+            }
+
+
             Log::info('Google Auth: Redirecting to intended URL', ['url' => $intendedUrl]);
             
             return redirect()->intended($intendedUrl);

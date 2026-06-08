@@ -30,7 +30,7 @@ class OrderFactory extends Factory
         }
 
         return [
-            'store_id'          => Store::factory(),
+            'store_id'          => Store::inRandomOrder()->first()?->id ?? 1,
             'order_number'      => 'ORD-' . strtoupper(Str::random(8)),
             'user_id'           => User::factory(),
             'coupon_id'         => null,

@@ -14,8 +14,9 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('store_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('name')->nullable();        // user might not fill yet
-            $table->string('slug')->unique()->nullable();        // user might not fill yet
+            $table->string('slug')->nullable();        // user might not fill yet
             $table->string('brand')->nullable();       // optional in draft
             $table->text('description')->nullable();   // optional in draft
             $table->boolean('is_featured')->default(false);
@@ -52,6 +53,8 @@ return new class extends Migration
             $table->json('related_product_ids')->nullable();
             $table->softDeletes();
             $table->timestamps();
+
+            $table->unique(['store_id', 'slug']);
         });
 
     }

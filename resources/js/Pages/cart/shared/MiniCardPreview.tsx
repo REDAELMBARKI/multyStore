@@ -1,5 +1,6 @@
 // Pages/Checkout/components/MiniCartPreview.tsx
 import { ThemePalette } from "@/types/ThemeTypes";
+import { usePage } from "@inertiajs/react";
 
 interface MiniCartPreviewProps {
     items: any[];
@@ -10,6 +11,7 @@ export default function MiniCartPreview({
     items = [],
     theme,
 }: MiniCartPreviewProps) {
+    const { storeCurrency } = usePage().props as any;
     return (
         <div
             style={{
@@ -84,7 +86,7 @@ export default function MiniCartPreview({
                                     style={{ color: theme.text }}
                                     className="font-semibold text-sm"
                                 >
-                                    ${item.price_snapshot}
+                                    {item.price_snapshot} {storeCurrency}
                                 </span>
                             </div>
                         </div>

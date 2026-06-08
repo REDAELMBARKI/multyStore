@@ -12,16 +12,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create a default store if none exists
-        if (Store::count() === 0) {
-            Store::create([
-                'name' => 'Default Store',
-                'slug' => 'default',
-            ]);
-        }
-
         $this->call([
-            SliderSeeder::class , 
+            StoreSeeder::class,
+            SliderSeeder::class, 
             AppFactoryConfigSeeder::class,
             storeSettingSeeder::class,
             UserSeeder::class,
@@ -41,8 +34,8 @@ class DatabaseSeeder extends Seeder
             
             // Other settings/support
             CouponSeeder::class,
-            // PromotionSeeder::class,
-            TestShippingSeeder::class ,
+            RewardScalingPromotionSeeder::class,
+       
             OrderSeeder::class,
             CartSeeder::class,
             ShippingSettingSeeder::class,

@@ -34,7 +34,7 @@ class SendInvoice implements ShouldQueue
     }
 
     public function failed(\Throwable $exception) : void {
-        Mail::to(config('Mail.admin'))
+        Mail::to(config('mail.from'))
                ->queue(new JobFailedMail($this->order , $exception))
         ;
     }
