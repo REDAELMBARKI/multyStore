@@ -22,6 +22,7 @@ class CollectionRequest extends FormRequest
     public function rules(): array
     {
         $collection = $this->route('collection');
+        $storeId = session('store_id');
         
         // Handle both model binding and raw ID/slug from route
         $id = null;
@@ -36,7 +37,7 @@ class CollectionRequest extends FormRequest
         }
 
         return [
-            'key'           => ['required', 'string', 'max:100', 'unique:rule_based_collections,key,' . $id],
+            'key'           => ['required', 'string', 'max:100', "unique:rule_based_collections,key,{$id},id,store_id,{$storeId}"],
             'name'          => ['required', 'string', 'max:255'],
             'is_active'     => ['nullable', 'boolean'],
             

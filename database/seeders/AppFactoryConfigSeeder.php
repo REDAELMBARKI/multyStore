@@ -12,9 +12,11 @@ class AppFactoryConfigSeeder extends Seeder
      */
     public function run(): void
     {
+        AppFactoryConfig::truncate();
+
         $collections_factoryPayloads = [
             [
-                'config_key' => 'home.new_arrivals',
+                'config_key' => 'collections.home.new_arrivals',
                 'description' => 'Factory default for the New Season Arrivals rule-based collection',
                 'payload' => [
                     'key' => 'home.new_arrivals',
@@ -40,7 +42,7 @@ class AppFactoryConfigSeeder extends Seeder
                 ]
             ],
             [
-                'config_key' => 'home.featured',
+                'config_key' => 'collections.home.featured',
                 'description' => 'Factory default for the The Featured Edit rule-based collection',
                 'payload' => [
                     'key' => 'home.featured',
@@ -66,7 +68,7 @@ class AppFactoryConfigSeeder extends Seeder
                 ]
             ],
             [
-                'config_key' => 'home.shoes',
+                'config_key' => 'collections.home.shoes',
                 'description' => 'Factory default for the Featured Footwear rule-based collection',
                 'payload' => [
                     'key' => 'home.shoes',
@@ -92,7 +94,7 @@ class AppFactoryConfigSeeder extends Seeder
                 ]
             ],
             [
-                'config_key' => 'home.watches',
+                'config_key' => 'collections.home.watches',
                 'description' => 'Factory default for the Luxury Timepieces rule-based collection',
                 'payload' => [
                     'key' => 'home.watches',
@@ -162,6 +164,82 @@ class AppFactoryConfigSeeder extends Seeder
                             ],
                         ],
                     ]
+                ]
+            ],
+            [
+                'config_key' => 'banners.flash_weekend',
+                'description' => 'Factory default for the Flash Sale Weekend banner',
+                'payload' => [
+                    'name' => 'Flash Sale Weekend',
+                    'key' => 'flash_weekend',
+                    'slug' => 'flash-sale-weekend',
+                    'direction' => 'ltr',
+                    'is_active' => true,
+                    'aspect_ratio' => '32:9',
+                    'border_radius' => '0px',
+                    'bg_color' => '#dc2626',
+                    'slots' => [
+                        [
+                            'slot_key' => 'left',
+                            'width' => '100',
+                            'is_visible' => true,
+                            'bg_color' => '#dc2626',
+                            'elements' => [
+                                'eyebrow' => ['text' => 'LIMITED TIME', 'color' => '#ffffff', 'visible' => true],
+                                'title' => ['text' => 'Weekend Flash: Up to 50% Off', 'color' => '#ffffff', 'visible' => true],
+                                'paragraph' => ['text' => 'Our biggest sale of the season is here. Selected items only.', 'color' => '#fee2e2', 'visible' => true],
+                                'button' => ['text' => 'SHOP THE SALE', 'bg_color' => '#ffffff', 'text_color' => '#dc2626', 'visible' => true],
+                            ],
+                        ],
+                    ],
+                ]
+            ],
+            [
+                'config_key' => 'banners.season_lookbook',
+                'description' => 'Factory default for the New Season Lookbook banner',
+                'payload' => [
+                    'name' => 'New Season Lookbook',
+                    'key' => 'season_lookbook',
+                    'slug' => 'season-lookbook',
+                    'direction' => 'ltr',
+                    'is_active' => true,
+                    'aspect_ratio' => '16:9',
+                    'border_radius' => '24px',
+                    'bg_color' => '#f9fafb',
+                    'slots' => [
+                        [
+                            'slot_key' => 'left',
+                            'width' => '35',
+                            'is_visible' => true,
+                            'main_media' => [
+                                'url' => 'https://images.pexels.com/photos/1183266/pexels-photo-1183266.jpeg?auto=compress&cs=tinysrgb&w=800',
+                                'collection' => 'banner',
+                                'media_type' => 'image',
+                            ],
+                        ],
+                        [
+                            'slot_key' => 'middle',
+                            'width' => '35',
+                            'is_visible' => true,
+                            'bg_color' => '#ffffff',
+                            'elements' => [
+                                'eyebrow' => ['text' => 'STREETWEAR', 'color' => '#6b7280', 'visible' => true],
+                                'title' => ['text' => 'Urban Essence', 'color' => '#111827', 'visible' => true],
+                                'paragraph' => ['text' => 'Bold designs for explorers.', 'color' => '#4b5563', 'visible' => true],
+                                'button' => ['text' => 'DISCOVER', 'bg_color' => '#111827', 'text_color' => '#ffffff', 'visible' => true],
+                            ],
+                        ],
+                        [
+                            'slot_key' => 'right',
+                            'width' => '35',
+                            'is_visible' => true,
+                            'main_media' => [
+                                'url' => 'https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?auto=compress&cs=tinysrgb&w=800',
+                                'collection' => 'banner',
+                                'media_type' => 'image',
+                            ],
+                        ],
+                    ],
                 ]
             ],
             [

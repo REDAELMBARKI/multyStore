@@ -101,12 +101,23 @@ class BannerRequest extends FormRequest
 
                     // Check if it's a valid internal GET route
                     try {
-                        // Ensure it starts with / for parsing, but handle absolute-looking relative paths
                         $path = parse_url($value, PHP_URL_PATH);
                         if (!$path) return;
+                        
+                        if (!str_starts_with($path, '/')) {
+                            $path = '/' . $path;
+                        }
 
-                        $request = \Illuminate\Http\Request::create($path, 'GET');
-                        app('router')->getRoutes()->match($request);
+                        // Try matching with current host first (to support tenant routes)
+                        try {
+                            $request = \Illuminate\Http\Request::create($path, 'GET', [], [], [], ['HTTP_HOST' => request()->getHost()]);
+                            app('router')->getRoutes()->match($request);
+                            return;
+                        } catch (\Exception $e) {
+                            // If it fails, try without host as fallback for central routes
+                            $request = \Illuminate\Http\Request::create($path, 'GET');
+                            app('router')->getRoutes()->match($request);
+                        }
                     } catch (\Exception $e) {
                         $fail("The link '{$value}' does not correspond to a valid application route.");
                     }
