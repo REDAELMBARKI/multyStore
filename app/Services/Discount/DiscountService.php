@@ -64,12 +64,19 @@ abstract class DiscountService
       
 
          public function calculateDiscount(Coupon | Promotion $discounted , float $eligibleTotal): float {
+            $discount = 0;
             if ($discounted->type === 'fixed') {
-                return (float)$discounted->value;
+                $discount = (float)$discounted->value;
             } elseif ($discounted->type === 'percentage') {
-                return ($discounted->value / 100) * $eligibleTotal;
+                $discount = ($discounted->value / 100) * $eligibleTotal;
             }
-            return 0;
+
+            // Apply max_discount_amount cap if it exists
+            if (isset($discounted->max_discount_amount) && $discounted->max_discount_amount > 0) {
+                $discount = min($discount, (float)$discounted->max_discount_amount);
+            }
+
+            return $discount;
         }
 
 }

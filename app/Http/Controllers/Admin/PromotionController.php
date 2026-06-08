@@ -15,29 +15,25 @@ class PromotionController extends Controller
     {
     }
 
-    public function index()
+    public function index($tenant)
     {
         return Inertia::render('admin/pages/promotions/index', [
             'promotions' => $this->promotionService->getAllPromotions()
         ]);
     }
 
-    public function create()
+    public function create($tenant)
     {
-        return Inertia::render('admin/pages/promotions/create', [
-            'products' => Product::all(['id', 'name']),
-            'categories' => Category::whereNull('parent_id')->get(['id', 'name']),
-            'subCategories' => Category::whereNotNull('parent_id')->get(['id', 'name']),
-        ]);
+        return Inertia::render('admin/pages/promotions/create');
     }
 
-    public function store(PromotionRequest $request)
+    public function store($tenant, PromotionRequest $request)
     {
         $this->promotionService->createPromotion($request->validated());
         return redirect()->route('promotions.index')->with('success', 'Promotion created successfully');
     }
 
-    public function edit($id)
+    public function edit($tenant, $id)
     {
         $promotion = $this->promotionService->getPromotionById($id);
         if (!$promotion) {
@@ -46,19 +42,16 @@ class PromotionController extends Controller
 
         return Inertia::render('admin/pages/promotions/create', [
             'promotion' => $promotion,
-            'products' => Product::all(['id', 'name']),
-            'categories' => Category::whereNull('parent_id')->get(['id', 'name']),
-            'subCategories' => Category::whereNotNull('parent_id')->get(['id', 'name']),
         ]);
     }
 
-    public function update(PromotionRequest $request, $id)
+    public function update($tenant, PromotionRequest $request, $id)
     {
         $this->promotionService->updatePromotion($id, $request->validated());
         return redirect()->route('promotions.index')->with('success', 'Promotion updated successfully');
     }
 
-    public function destroy($id)
+    public function destroy($tenant, $id)
     {
         $this->promotionService->deletePromotion($id);
         return redirect()->route('promotions.index')->with('success', 'Promotion deleted successfully');

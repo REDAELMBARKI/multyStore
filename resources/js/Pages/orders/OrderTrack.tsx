@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useStoreConfigCtx } from "@/contextHooks/useStoreConfigCtx";
 import StoreConfigProvider from "@/contextProvoders/StoreConfigProvider";
+import { router } from "@inertiajs/react";
 import { Order, ShippingZone, TrackOrderProps } from "@/types/orders/trackordertypes";
 import { ThemePalette } from "@/types/ThemeTypes";
 import Layout from "@/Layouts/Layout";
+import { useToast } from "@/contextHooks/useToasts";
 
 // ─────────────────────────────────────────────────────────────
 // HELPERS
@@ -25,15 +27,16 @@ const stringToColor = (str: string) => {
   return palette[Math.abs(hash) % palette.length];
 };
 
-// ── fixed: schema uses 'cancelled' not 'canceled'
 const STATUS_COLOR: Record<string, string> = {
-  pending:          "#E8A838",
-  confirmed:        "#4C9EE8",
-  out_for_delivery: "#A878E8",
-  delivered:        "#4CAF7D",
-  cancelled:        "#E85C5C",   // ✅ was 'canceled'
-  returned:         "#E85C5C",
-  delivery_failed:  "#E85C5C",
+  pending: "#EAB308", // yellow-500
+  confirmed: "#22C55E", // green-500
+  processing: "#3B82F6", // blue-500
+  shipped: "#8B5CF6", // purple-500
+  out_for_delivery: "#06B6D4", // cyan-500
+  delivered: "#10B981", // emerald-500
+  cancelled: "#EF4444", // red-500
+  returned: "#6B7280", // gray-500
+  delivery_failed: "#F97316", // orange-500
 };
 
 // ── payment_status colors (new — from schema)
@@ -44,10 +47,11 @@ const PAYMENT_STATUS_COLOR: Record<string, string> = {
 };
 
 const TIMELINE_STEPS = [
-  { status: "pending",          label: "Placed"     },
-  { status: "confirmed",        label: "Confirmed"  },
-  { status: "out_for_delivery", label: "On the Way" },
-  { status: "delivered",        label: "Delivered"  },
+  { status: "pending", label: "Ordered" },
+  { status: "confirmed", label: "Confirmed" },
+  { status: "processing", label: "Preparing" },
+  { status: "shipped", label: "In Transit" },
+  { status: "delivered", label: "Arrived" },
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -542,6 +546,43 @@ export function OrderHeader({ order, theme }: { order: Order; theme: ThemePalett
 // ─────────────────────────────────────────────────────────────
 function OrderTrack({ order, shipping }: TrackOrderProps) {
   const { state: { currentTheme: theme } } = useStoreConfigCtx();
+  const { addToast } = useToast();
+
+  // Listen for real-time updates and poll as fallback
+  useEffect(() => {
+    let interval: any;
+    
+    // 1. WebSocket Listener (Laravel Echo)
+    const echo = (window as any).Echo;
+    if (echo) {
+      echo.private(`orders.${order.id}`)
+        .listen('OrderConfirmed', (e: any) => {
+          addToast({
+            type: "success",
+            title: "Order Confirmed!",
+            description: "Your payment has been successfully processed."
+          });
+          router.reload({ only: ['order'] });
+        });
+    }
+
+    // 2. Polling Fallback (if payment is still pending)
+    if (order.payment_status === 'pending' || order.order_status === 'pending') {
+      interval = setInterval(() => {
+        router.reload({
+          only: ['order'],
+          preserveScroll: true,
+        });
+      }, 5000); // Check every 5 seconds
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+      if (echo) {
+        echo.leave(`orders.${order.id}`);
+      }
+    };
+  }, [order.id, order.payment_status, order.order_status]);
 
   // ✅ fixed: schema uses 'cancelled' not 'canceled'
   const isFailed = ["cancelled", "returned", "delivery_failed"].includes(order.order_status);

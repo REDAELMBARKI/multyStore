@@ -155,10 +155,13 @@ class PromotionService extends DiscountService
         $promos = $this->promotionRepository->getPromotionsSetForAmount();
         $defaultShippingAmount = $this->shippingService->avgShippingCost();
         $items = $this->cartService->getCartItems();
-        $cartTotal = $this->cartService->calculateCartItemsSubtotal($items->toArray());
+        $cartTotal = $this->cartService->calculateCartItemsSubtotal($items ? $items->toArray() : []);
         $globalShippingSettings = $this->shippingService->getShippingSettings();
+
         return $promos
             ->filter(function($promo) use ($globalShippingSettings){ 
+                if (!$globalShippingSettings) return true;
+                
                 return  ($promo->type === 'free_shipping' 
                         && $globalShippingSettings->free_shipping_threshold_amount > 0 
                         && $promo->minimum_order_amount > $globalShippingSettings->free_shipping_threshold_amount )? 
@@ -181,35 +184,37 @@ class PromotionService extends DiscountService
             $estimatedValue = 0;
             $message = '';
             $remaining = max(0, $promo->minimum_order_amount - $cartTotal);
-            $discount_label = "get " . $promo->value . "% off";
+            $clean_value = (float)$promo->value;
+            $clean_max = (float)$promo->max_discount_amount;
+            
+            $discount_label = "get " . $clean_value . "% off";
+            $cap_text = $clean_max > 0 ? " (up to " . $clean_max . " " . $this->store_currency . ")" : "";
+            $discount_label .= $cap_text;
 
-         
-            if ($promo->max_discount_amount) {
-                $discount_label .= " (up to " . $promo->max_discount_amount . " " . $this->store_currency . ")";
-            }
             if ($promo->type === 'percentage') {
-                $leakedDiscount = $promo->minimum_order_amount * ($promo->value / 100);
+                $leakedDiscount = $promo->minimum_order_amount * ($clean_value / 100);
 
                 // Only cap if max_discount_amount is set and leakedDiscount exceeds it
-                $estimatedValue = ($promo->max_discount_amount && $leakedDiscount > $promo->max_discount_amount)
-                    ? $promo->max_discount_amount
+                $estimatedValue = ($clean_max > 0 && $leakedDiscount > $clean_max)
+                    ? $clean_max
                     : $leakedDiscount;
 
-                $message = 'Add ' . $remaining . " " . $this->store_currency . " and " . $discount_label;
+                $message = 'Add ' . (float)$remaining . " " . $this->store_currency . " and " . $discount_label;
 
             } elseif ($promo->type === 'free_shipping' ) {
                 $estimatedValue = $defaultShippingAmount;
-                $message = 'Add ' . $remaining . " " . $this->store_currency . ' and get Free Shipping';
+                $message = 'Add ' . (float)$remaining . " " . $this->store_currency . ' and get Free Shipping';
             }
 
             return [
-                'max' => $promo->max_discount_amount,
+                'max' => $clean_max,
                 'goal' => (float) $promo->minimum_order_amount,
-                'label' => $promo->type === 'percentage' ? $promo->value . '%' : "FREE SHIPPING",
-                'percentage' => $promo->value ,
+                'label' => ($promo->type === 'percentage' ? $clean_value . '%' : "FREE SHIPPING") . $cap_text,
+                'percentage' => $clean_value ,
                 'type' => $promo->type === 'free_shipping' ? 'free_shipping' : 'discount',
                 'estimated_value' => (float) $estimatedValue,
-                'message' => $message
+                'message' => $message,
+                'discount_label' => $discount_label
             ];
         });
 

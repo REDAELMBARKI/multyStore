@@ -7,6 +7,7 @@ use App\Http\Requests\StoreDraftProductRequest;
 use App\Http\Resources\ProductDetailResource;
 use App\Http\Resources\ProductResources;
 use App\Http\Resources\ProductTest;
+use App\Models\Badge;
 use App\Services\product\ProductService;
 use App\Models\Category;
 use App\Models\Media;
@@ -29,7 +30,7 @@ class ProductController extends Controller
     
      }
      
-    public function index(){
+    public function index($tenant){
         $products = Product::with(['thumbnail', 'nichCategory', 'subCategories', 'variants'])
             ->latest()
             ->get();
@@ -40,7 +41,7 @@ class ProductController extends Controller
    
 
 
-    public function drafts() {
+    public function drafts($tenant) {
         
         $drafts = Product::with(['thumbnail' , 'variants' , 'nichCategory' , 'subCategories'])
         ->where('status' , 'draft')
@@ -51,7 +52,7 @@ class ProductController extends Controller
     }
 
 
-    public function create()
+    public function create($tenant)
     {
             // gate product management 
             $parents = DB::table('variants_options_settings')->whereNull('parent_id')->get(['key']) ;
@@ -65,7 +66,7 @@ class ProductController extends Controller
                 [
                     'nich_cats' =>  $this->categoryService->get_niche_cats(),
                     'shipping_class' => ShippingSetting::value('shipping_class') ,
-                    'badges' => DB::table("badges")->get(['id' , 'name' , 'color' , 'icon']),
+                    'badges' => Badge::get(['id' , 'name' , 'color' , 'icon']),
                     'variants_options' => $options,
                  ]);
     }
@@ -74,7 +75,7 @@ class ProductController extends Controller
     /*
         creates the draft initialy 
     */
-        public function storeDraft()
+        public function storeDraft($tenant)
         {
             // gates product management 
 
@@ -90,7 +91,7 @@ class ProductController extends Controller
         /*
         publiches the draft afeter validation
         */
-        public function publish(PublishProductRequest $publishProductRequest , Product $product)
+        public function publish($tenant, PublishProductRequest $publishProductRequest , Product $product)
         {
             // gate product management 
 
@@ -108,7 +109,7 @@ class ProductController extends Controller
         saves the product (update) with validation (on submit click)
         */
         
-        public function  updateOnSubmit(PublishProductRequest $publishProductRequest , Product $product){
+        public function  updateOnSubmit($tenant, PublishProductRequest $publishProductRequest , Product $product){
             // gate product management 
             // $payload = $publishProductRequest->validated();
             $payload = $publishProductRequest->validated();
@@ -122,7 +123,7 @@ class ProductController extends Controller
         
         */
         
-        public function updateOnPageLeave(StoreDraftProductRequest $draftRequest , Product $product){
+        public function updateOnPageLeave($tenant, StoreDraftProductRequest $draftRequest , Product $product){
             // gate product management 
             $payload = $draftRequest->validated();
             $this->productService->saveDraft($payload , $product );
@@ -130,7 +131,7 @@ class ProductController extends Controller
         
         
         
-    public function edit(Product $product){
+    public function edit($tenant, Product $product){
             try {
             $product = $product->load(['thumbnail', 'covers', 'videos', 'tags', 'variants.images', 'subCategories']);
             $parents = DB::table('variants_options_settings')->whereNull('parent_id')->get(['key']) ;
@@ -156,7 +157,7 @@ class ProductController extends Controller
     }
 
 
-    public function destroy(Product $product){
+    public function destroy($tenant, Product $product){
         //  Gate::authorize('manage_products') ;
          try {
           $product->delete();
@@ -167,7 +168,12 @@ class ProductController extends Controller
     }
 
 
-    public function show(Product $product){
+    public function show($tenant, $product){
+       // Support both ID and Slug for flexibility
+       $product = Product::where('slug', $product)
+            ->orWhere('slug', $product)
+            ->firstOrFail();
+
        $product->load('variants','nichCategory','subCategories','thumbnail',
                       'covers' , 'videos'  , 'badge' , 'reviews.user.avatar');
        return inertia::render("admin/pages/products/Show"  , [
@@ -177,7 +183,7 @@ class ProductController extends Controller
 
 
 
-    public function suggest(Request $request){
+    public function suggest($tenant, Request $request){
         //   $request->validate(['q' => ['string' , 'min:2']]);
         //   $query = $request->validated("q");
         //   $excludes = $request->validated("excludes") ?? [];
@@ -202,7 +208,7 @@ class ProductController extends Controller
     }
 
 
-    public function duplicate(Product $product){
+    public function duplicate($tenant, Product $product){
         //  Gate::authorize('manage_products') ;
        // gate admin later
        try {

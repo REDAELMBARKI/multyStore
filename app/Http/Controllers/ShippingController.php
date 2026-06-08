@@ -24,13 +24,15 @@ class ShippingController extends Controller
 
 
     public function calculate(string $name, Request $request, ShippingService $shippingService) {
-          $cityRecord = ShippingZoneCity::where('city' , $name)->firstOrFail();
+          $cityRecord = ShippingZoneCity::where('city' , $name)
+            ->whereHas('shipping_zone') // Ensure it belongs to current store
+            ->firstOrFail();
           // Fallback to empty items if not provided
           $items = $request->input('items', []);
           $promotionId = $request->input('promotionId');
 
           try {
-              $cost = $shippingService->calculateShipping($items, $cityRecord, $promotionId);
+              $cost = $shippingService->calculateShipping($items, $cityRecord->city, $promotionId);
               $zone = $cityRecord->shipping_zone()->first(['estimated_days', 'price']);
               
               return response()->json([
@@ -45,8 +47,8 @@ class ShippingController extends Controller
 
   
     public function getCities() {
-        $cities =  ShippingZoneCity::all(['id' , 'city']);
-
+        // Query through ShippingZone to respect the BelongsToStore global scope
+        $cities =  ShippingZoneCity::whereHas('shipping_zone')->get(['id' , 'city']);
 
         return response()->json(['cities'=> $cities],200) ;
     }

@@ -622,7 +622,7 @@ export default function VariantCard({
     const [overrideImage, setOverrideImage] = useState(false);
     const [errors, setErrors] = useState<FormErrors>(null);
     const imgRef = useRef<HTMLInputElement>(null);
-    const {getValues } = useProductDataCtx()
+    const { getValues, control } = useProductDataCtx();
     const { fields: variants, append, remove, update } = useFieldArray<ProductSchemaType, 'variants'>({
         control,
         name: 'variants'
@@ -799,9 +799,9 @@ export default function VariantCard({
 
                 {!variant.isOpen && (
                     <span style={{ fontSize: 12, color: theme.textMuted }}>
-                        {variant.price || defaultVariantsPrice} MAD
+                        {Number(variant.price ?? defaultVariantsPrice ?? 0)} MAD
                         &nbsp;·&nbsp;
-                        {variant.stock ? (
+                        {Number(variant.stock ?? 0) > 0 ? (
                             `${variant.stock} units`
                         ) : (
                             <span style={{ color: theme.error + "cc" }}>

@@ -125,9 +125,9 @@ Route::post('/order/buy-now/now', [OrderController::class , 'store'])->name('ord
 // cart
 Route::get('/cart', [CartController::class , 'index'])->name('shoppingCart.index');
 Route::post('/cart', [CartController::class , 'store'])->name('cart.store');
-Route::patch('/cart/{id}', [CartController::class , 'update'])->name('cart.update');
+Route::patch('/cart/{cart}', [CartController::class , 'update'])->name('cart.update');
 Route::delete('/cart/clear', [CartController::class , 'clear'])->name('cart.clear');
-Route::delete('/cart/{id}', [CartController::class , 'destroy'])->name('cart.destroy');
+Route::delete('/cart/{cart}', [CartController::class , 'destroy'])->name('cart.destroy');
 
 // checkout steps routes (this fakes the url to make steps work fine)
 Route::get('/checkout', [CartController::class, 'index']);
@@ -135,6 +135,7 @@ Route::get('/checkout', [CartController::class, 'index']);
 
 //shipping
 Route::get('/shippings_cities' , [ShippingController::class, 'getCities'])->name('shipping.cities.get') ;
+Route::get('/reward/calculateBestRewardForUser', [PromotionController::class, 'calculateBestRewardForUser'])->name('shipping.calculateBestRewardForUser');
 
 
 // routes/web.php or api.php
@@ -191,7 +192,7 @@ Route::prefix('products')->group(function(){
 })->can('manage-products');
 
 // Public Product Detail
-Route::get('/products/{product:id}', [ProductController::class, 'show'])->name('product.show');
+Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('product.show');
 
 // media section
 // store media route
@@ -231,7 +232,11 @@ Route::get("/admin/theme" , function() {
 })->name("admin.theme");
 
 // admin
+// admin user management
 Route::get('/admins' , [AdminController::class, 'index'])->name('admins.index') ;
+Route::post('/admins' , [AdminController::class, 'store_user'])->name('admin.roles.store_user') ;
+Route::put('/admins/{user}' , [AdminController::class, 'update_user'])->name('admin.roles.update_user') ;
+Route::delete('/admins/{user}' , [AdminController::class, 'destroy_user'])->name('admin.roles.destroy_user') ;
 
 // variants managment
 Route::get('/variants/colors' , [VariantsController::class, 'colors'])->name('variants.colors') ;

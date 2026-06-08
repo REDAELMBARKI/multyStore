@@ -26,20 +26,23 @@ class ProductDetailResource extends JsonResource
                              ->get() ;
 
         $colors = $variants
-                ->filter()
-                ->unique()
+                ->filter(function($variant) {
+                    return isset($variant->attrs['color']);
+                })
                 ->map(function ($variant){
-                    return collect([
-                        "variant_id"=> $variant->id ?? null  ,
+                    return [
+                        "variant_id"=> $variant->id,
                         "hex" => $variant->attrs['color']['hex'] ?? null ,
                         "name" => $variant->attrs['color']['name'] ?? null ,
-                    ]) ;
+                    ] ;
                 })
+                ->unique('name')
                 ->values()
                 ->toArray()
                 ;
         return [
-            ...Arr::except(parent::toArray($request) , ['thumbnail' , 'vendor' , 'slug']),
+            ...Arr::except(parent::toArray($request) , ['thumbnail' , 'vendor' , 'slug' , 'variants' , 'nich_category' , 'sub_categories']),
+           "variants" => $variants,
            "covers" => [
              $this->whenLoaded("thumbnail") ,
              ...$this->whenLoaded("covers") ,

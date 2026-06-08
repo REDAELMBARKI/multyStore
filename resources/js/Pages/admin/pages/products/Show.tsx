@@ -16,10 +16,11 @@ interface ShowPageMasterProps {
 }
 
 export default function Show({tax =  2}: ShowPageMasterProps) {
+    const { product } = usePage<any>().props;
     const [step , setStep] = useState(0);
     const [backendErrors , setBackendErrors] = useState<any>({}) ;
-    const [items , setItems]= useState([]) ; 
-    // const [zone , setZone] 
+    const [items , setItems]= useState<any[]>([]) ; 
+    const [zone , setZone] = useState<any>(null) ; 
  
     const [shippingData, setShippingData] = useState({
         address: {
@@ -33,6 +34,7 @@ export default function Show({tax =  2}: ShowPageMasterProps) {
         },
         notes: "",
     });
+
     const [productUrl] = useState(() => window.location.pathname);
     
     const onChangeBackendErrors = (errors : any) => {
@@ -74,10 +76,26 @@ export default function Show({tax =  2}: ShowPageMasterProps) {
     }, []);
 
 
-    const onStepChange = (action: 'prev' | 'next') => {
+    const onStepChange = (action: 'prev' | 'next', buyNowItems?: any[]) => {
             const newStep = action === 'next' ? step + 1 : step - 1;
+            
+            if (buyNowItems) {
+                setItems(buyNowItems);
+            } else if (newStep === 1 && items.length === 0) {
+                // Default to first variant if no items provided and moving to shipping
+                const defaultVariant = product?.variants?.[0];
+                if (defaultVariant) {
+                    setItems([{
+                        ...defaultVariant,
+                        name: product.name,
+                        thumbnail: product.thumbnail,
+                        quantity: 1,
+                        price_snapshot: defaultVariant.price
+                    }]);
+                }
+            }
+
             setStep(newStep);
-            //  ineed to empty this history in each decrement bro when iplay iwht increment decrement it gets accumulated
             window.history.pushState({}, '', stepUrls[newStep]);
         };
     const onResetShippingData = () => {
@@ -100,8 +118,8 @@ export default function Show({tax =  2}: ShowPageMasterProps) {
 
     const stepsCompos : Record<string , React.ReactElement> = {
         '0' : <ProductDetails  {...{ onStepChange }} /> , 
-        '1' : <ShippingPage {...{items ,tax , shippingData, setShippingData , onStepChange , backendErrors  , onChangeBackendErrors }} /> , 
-        '2' : <CheckoutPage {...{ postUrl : "order.buynow" , items , shippingData , tax , onStepChange , onChangeBackendErrors ,onResetShippingData}} /> , 
+        '1' : <ShippingPage {...{items ,tax , shippingData, setShippingData , onStepChange , backendErrors  , onChangeBackendErrors, zone, setZone }} /> , 
+        '2' : <CheckoutPage {...{ postUrl : "order.buynow" , items , shippingData , tax , onStepChange , onChangeBackendErrors ,onResetShippingData, zone}} /> , 
     };
 
 

@@ -12,7 +12,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class OrderConfirmed
+class OrderConfirmed implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -31,7 +31,15 @@ class OrderConfirmed
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('channel-name'),
+            new PrivateChannel('orders.' . $this->order->id),
+        ];
+    }
+
+    public function broadcastWith(): array
+    {
+        return [
+            'payment_status' => $this->order->payment_status,
+            'order_status'   => $this->order->order_status,
         ];
     }
 }

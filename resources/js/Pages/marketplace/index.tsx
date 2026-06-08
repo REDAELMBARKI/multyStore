@@ -419,7 +419,7 @@ export default function Marketplace({ products, categories, brands, priceRange, 
                                 </div>
                             ) : products.data.length > 0 ? (
                                 <>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+                                    <div className="grid grid-cols-1 sm:grid-cols-4 xl:grid-cols-4 gap-6">
                                         {products.data.map((product) => (
                                             <ProductCardMaster key={product.id} product={product} />
                                         ))}

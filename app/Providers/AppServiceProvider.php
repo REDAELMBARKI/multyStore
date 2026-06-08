@@ -27,23 +27,14 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-  
+
     public function boot(): void
     {
-        
+
         Order::observe(OrderObserver::class);
         Vite::prefetch(concurrency: 3);
 
-        //gates
-        Gate::define('manage-products' , function(User $user){
-            return $user->hasRole('Admin') || $user->hasRole('manage-products');
-        });
-
-
-        Gate::define('manage-orders' , function(User $user ){
-            return $user->hasRole('Admin') || $user->hasRole('manage-orders');
-        });
-
+     
 
         // morphs aliases
         // sortable -  mediable
@@ -55,6 +46,6 @@ class AppServiceProvider extends ServiceProvider
             'banner' => 'App\Models\Banner',
             'product_collection' => 'App\Models\RuleBasedCollection',
         ]);
-    
+
     }
 }

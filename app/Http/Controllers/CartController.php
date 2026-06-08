@@ -25,8 +25,9 @@ class CartController extends Controller
     {
         $items = $this->cartService->getCartItems(false);
         $defaultShippingAmount = $this->shippingService->avgShippingCost();
+        
         return Inertia::render('cart/ShoppingCartMaster', [
-              'items' => $items ,
+              'items' => CartResource::collection($items),
               'currency' =>  $this->storeSettingsService->getStoreCurrency() , 
               'defaultShippingAmount' => $defaultShippingAmount
               ]
@@ -50,7 +51,7 @@ class CartController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function update($tenant, Request $request, $id)
     {
         $request->validate([
             'quantity' => 'required|integer|min:1'
@@ -62,13 +63,13 @@ class CartController extends Controller
         return back()->with('success', 'Cart updated');
     }
 
-    public function clear()
+    public function clear($tenant)
     {
         $this->cartService->clearCart();
         return back()->with('success', 'Cart cleared successfully');
     }
 
-    public function destroy($id)
+    public function destroy($tenant, $id)
     {
         Cart::destroy($id);
         return back()->with('success', 'Item removed from cart');

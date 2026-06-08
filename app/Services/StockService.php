@@ -55,9 +55,9 @@ class StockService
     public function validateFromStore(Collection $items , Collection $params): void
      {
          foreach($params as $param){
-            $item = $items->get($param->variant_id);
-            $variantLabel = $item->attributeValues->pluck('value')->join(', ');
-            if($item->stock < $param->quantity){
+            $item = $items->get($param['variant_id']);
+            $variantLabel = $item->sku; // Fallback since attributeValues is not loaded
+            if($item->stock < $param['quantity']){
                  $message = '' ;
                  if($item->stock > 0) {
                     $message = "Only {$item->stock} items available for {$item->product->name} ({$variantLabel})" ;

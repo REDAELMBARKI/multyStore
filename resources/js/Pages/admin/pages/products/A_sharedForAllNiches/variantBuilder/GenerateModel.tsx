@@ -2,6 +2,9 @@ import { useState } from "react";
 import { X, Zap, Plus } from "lucide-react";
 import { Variant } from "@/types/products/productVariantType";
 import { ThemePalette } from "@/types/ThemeTypes";
+import { useFieldArray } from "react-hook-form";
+import { useProductDataCtx } from "@/contextHooks/product/useProductDataCtx";
+import { ProductSchemaType } from "@/shemas/productSchema";
 
 const DB_COLORS = [
   { name: "Black",  hex: "#1a1a1a" }, { name: "White",  hex: "#f0f0f0" },
@@ -50,6 +53,12 @@ export default function GenerateModal({
   const [generated, setGenerated] = useState<Array<Record<string, string>>>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
+  const { getValues, control } = useProductDataCtx();
+  const { fields: variants, append, remove, update } = useFieldArray<ProductSchemaType, 'variants'>({
+      control,
+      name: 'variants'
+  });
+
   const toggleValue = (opt: string, val: string) => {
     setModalValues((prev) => {
       const cur = prev[opt] || [];
@@ -62,12 +71,12 @@ export default function GenerateModal({
 
   const alreadyAdded = (combo: Record<string, string>) =>
     existingVariants.some((v) => {
-      const vKey = activeOptions.map((o) => {
-        if (o === "Color") {
+    const vKey = activeOptions.map((o) => {
+        if (o.toLowerCase() === "color") {
           const c = v.attrs?.color as { name: string } | undefined;
           return c?.name ?? "";
         }
-        return v.attrs?.[o] as string ?? "";
+        return v.attrs?.[o.toLowerCase()] as string ?? "";
       }).join(" / ");
       return vKey === comboKey(combo);
     });
@@ -82,7 +91,7 @@ export default function GenerateModal({
         // ✅ build attrs: color goes in as { hex, name }, rest as strings
         const attrs: Record<string, any> = {};
         Object.entries(c).forEach(([k, v]) => {
-          if (k === "Color") {
+          if (k.toLowerCase() === "color") {
             attrs.color = { hex: COLOR_HEX[v] || "#888", name: v };
           } else {
             attrs[k.toLowerCase()] = v;
@@ -92,9 +101,9 @@ export default function GenerateModal({
         return {
           variant_id: `gen-${Date.now()}-${i}`,
           attrs,
-          price: defaultVariantsPrice,
-          compare_price : defaultVariantsPrice , 
-          stock: "",
+          price: Number(defaultVariantsPrice ?? 0),
+          compare_price: Number(defaultVariantsPrice ?? 0),
+          stock: 0,
           sku: null,
           image : {
             id : null , 
@@ -178,7 +187,7 @@ export default function GenerateModal({
                 {opt}
               </p>
               <div className="flex flex-wrap gap-2">
-                {opt === "Color"
+                {opt.toLowerCase() === "color"
                   ? DB_COLORS.map((c) => {
                       const active = (modalValues[opt] || []).includes(c.name);
                       return (

@@ -87,9 +87,21 @@ class User extends Authenticatable
         }
 
         if (is_array($role)) {
-            return !!$role->intersect($this->roles)->count();
+            return $this->roles->pluck('name')->intersect($role)->isNotEmpty();
         }
 
         return false;
+    }
+
+    public function hasPermission($permission)
+    {
+        // Check if user is Admin (god mode)
+        if ($this->hasRole('Admin')) {
+            return true;
+        }
+
+        return $this->roles->contains(function ($role) use ($permission) {
+            return is_array($role->claims) && in_array($permission, $role->claims);
+        });
     }
 }

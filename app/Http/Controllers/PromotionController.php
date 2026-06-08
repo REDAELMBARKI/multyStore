@@ -44,39 +44,50 @@ class PromotionController extends Controller
     }
 
 
-      public function calculateBestRewardForUser()
+      public function calculateBestRewardForUser($tenant)
     {
         $items = $this->cartService->getCartItems();
-        $cartTotal = $this->cartService->calculateCartItemsSubtotal($items->toArray());
-        
-        if ($cartTotal == 0) {
-            return response()->json([
-                'bestRewardForUser' => null,
+        if (!$items) {
+             return response()->json([
+                'nextMilestone' => null,
+                'currentMilestone' => null,
                 'milestones' => []
             ], 200);
         }
 
+        $cartTotal = $this->cartService->calculateCartItemsSubtotal($items->toArray());
+        
+        if ($cartTotal == 0) {
+            return response()->json([
+                'nextMilestone' => null,
+                'currentMilestone' => null,
+                'milestones' => []
+            ], 200);
+        }
+
+        // 1. Prepare raw milestones (including free shipping if applicable)
         $globalShipping = ShippingSetting::where('free_shipping_type' , 'amount')->first();
-        $milestones = $this->promotionService->getPromotionMillestones();
-        $goal = (float) $globalShipping->free_shipping_threshold_amount ;
-        $remaining = max(0, $goal - $cartTotal) ;
+        $milestones = $this->promotionService->getPromotionMillestones() ?? collect([]);
+        
         if ($globalShipping 
-            && $globalShipping->free_shipping_threshold_amount > 0
-            && !$milestones->contains(fn($m) => $m['type']  === 'free_shipping')
+            && (float)$globalShipping->free_shipping_threshold_amount > 0
+            && !$milestones->contains(fn($m) => ($m['type'] ?? '')  === 'free_shipping')
             ) {
+            $goal = (float) $globalShipping->free_shipping_threshold_amount ;
+            $remaining = max(0, $goal - $cartTotal) ;
             $milestones->push([
                 'goal' => $goal,
                 'label' => 'FREE SHIPPING',
                 'percentage' => null ,
                 'type' => 'free_shipping',
                 'estimated_value' => (float) $this->shippingService->avgShippingCost(),
-                'message' => "Add " .$remaining . " " .$this->store_currency  ." and get a Free Shipping " 
+                'message' => "Add " . number_format($remaining, 2) . " " .$this->store_currency  ." and get a Free Shipping " 
             ]);
         }
 
-
         // 2. Process milestones: Group by goal (keep best reward per goal) and sort
         $sortedMilestones = $milestones
+                            ->filter(fn($m) => isset($m['goal']))
                             ->groupBy('goal')
                             ->map(fn($group) => $group->sortByDesc("estimated_value")->first())
                             ->sortBy('goal')
@@ -86,20 +97,20 @@ class PromotionController extends Controller
         $finalMilestones = collect();
         $currentMaxValue = -1;
 
-        //   keep th scalling of the reward gos up only keep if has estiimatedsave biger then the previous
         foreach ($sortedMilestones as $m) {
-            if ($m['estimated_value'] > $currentMaxValue) {
+            if (($m['estimated_value'] ?? 0) >= $currentMaxValue) {
                 $finalMilestones->push($m);
-                $currentMaxValue = $m['estimated_value'];
+                $currentMaxValue = $m['estimated_value'] ?? 0;
             }
         }
 
-        // 4. Recalculate next milestone from the filtered set
-        $nextMilestone = $finalMilestones->first(fn($m) => $m['goal'] > $cartTotal);
-        $currentMilestone = $finalMilestones->last(fn($m) => $m['goal'] <= $cartTotal);
+        // 4. Calculate current reached and next milestone
+        $currReachedMilestone = $finalMilestones->filter(fn($m) => $cartTotal >= $m['goal'])->last();
+        $nextMilestone = $finalMilestones->filter(fn($m) => $cartTotal < $m['goal'])->first();
+
         return response()->json([
+            'currentMilestone' => $currReachedMilestone,
             'nextMilestone' => $nextMilestone,
-            'currentMilestone' => $currentMilestone ,
             'milestones' => $finalMilestones
         ], 200);
     }

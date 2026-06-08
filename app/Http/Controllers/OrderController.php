@@ -34,7 +34,7 @@ class OrderController extends Controller
         private DTOService $dtoService ,
     ) {}
     
-    public function index() {
+    public function index($tenant) {
         $sheet = GoogleSheet::where('key', 'orders')->first();
         return Inertia::render('admin/pages/orders/OrderManager' ,
         [
@@ -48,7 +48,7 @@ class OrderController extends Controller
     }
 
    
-    public function store(SingleOrderRequest $request , OrderAction $action)
+    public function store($tenant, SingleOrderRequest $request , OrderAction $action)
     {   
          try {
          if ($request->payment_method === 'CARD' && !Auth::check()) {
@@ -94,7 +94,7 @@ class OrderController extends Controller
     }
 
 
-    public function checkout(CheckoutOrderRequest $request , OrderAction $action , CartService $cartService)
+    public function checkout($tenant, CheckoutOrderRequest $request , OrderAction $action , CartService $cartService)
     
     {
         try{
@@ -153,7 +153,7 @@ class OrderController extends Controller
         }
     }
 
-    public function authTrack(Order $order){
+    public function authTrack($tenant, Order $order){
 
           if(Auth::id() !== $order->user_id){
                abort(403);
@@ -163,7 +163,7 @@ class OrderController extends Controller
     }
 
     
-    public function guestTrack(string $token){
+    public function guestTrack($tenant, string $token){
         if(Auth::check()){
               return redirect()->route('orders.index')->with('message', 'Please use your account to track orders');
         }
@@ -189,10 +189,10 @@ class OrderController extends Controller
         ]);
     }
 
-    public function destroy(Order $order)
+    public function destroy($tenant, Order $order)
     {
         abort_if(Auth::id() !== $order->user_id, 403);
-        Order::destroy($order->id);
+        $order->delete();
     }
 
 

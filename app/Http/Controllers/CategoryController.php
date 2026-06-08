@@ -22,12 +22,12 @@ class CategoryController extends Controller
     {
     }
 
-    public function index(){
+    public function index($tenant){
         return Inertia::render('admin/pages/categories/Index' , [
             "categories" => $this->categoryService->getAllCats($this->couponService ,$this->promotionService )
         ]);
     }
-    public function subCategories(Request $request){
+    public function subCategories($tenant, Request $request){
         $request->validate([
             'parent_id' => ['required' , 'string'] ,
         ]) ;
@@ -35,7 +35,7 @@ class CategoryController extends Controller
         return response()->json($subCategories);
     }
 
-    public function create(PromotionService $promotionService , CouponService $couponService){
+    public function create($tenant, PromotionService $promotionService , CouponService $couponService){
         
         return Inertia::render("admin/pages/categories/Create" , [
             'niches' => $this->categoryService->get_niche_cats() ,
@@ -44,7 +44,7 @@ class CategoryController extends Controller
         ]) ;
     }
 
-    public function edit(Category $category , PromotionService $promotionService , CouponService $couponService){
+    public function edit($tenant, Category $category , PromotionService $promotionService , CouponService $couponService){
         
         return Inertia::render("admin/pages/categories/Create" , [
             'category' => $category ,
@@ -55,7 +55,7 @@ class CategoryController extends Controller
     }
 
 
-    public function store(Request $request){
+    public function store($tenant, Request $request){
         $request->validate([
             'id' => ['nullable' ,Rule::exists('categories' , 'id') ] ,
             'flag' => ['required' , Rule::in(['add-subs' , 'add-niches'])],

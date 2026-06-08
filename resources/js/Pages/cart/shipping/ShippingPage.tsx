@@ -61,8 +61,10 @@ export default function ShippingPage({items = [], tax  , shippingData, setShippi
           return () => ctrl.abort()
     },[])
 
-    const subtotal = items.reduce(
-        (sum, item) => sum + item.price_snapshot * item.quantity,
+    const cartItems = Array.isArray(items) ? items : (items as any)?.data || [];
+
+    const subtotal = cartItems.reduce(
+        (sum: number, item: any) => sum + (Number(item.price_snapshot) || 0) * (Number(item.quantity) || 0),
         0
     );
    
@@ -88,7 +90,7 @@ export default function ShippingPage({items = [], tax  , shippingData, setShippi
     const onCityChange = async (cityName :string) => {
         try{
           const res = await axios.post(route('shipping.calculate' , {name: cityName}), {
-              items: items
+              items: cartItems
           })
 
           console.log(res)
@@ -152,7 +154,7 @@ export default function ShippingPage({items = [], tax  , shippingData, setShippi
                             <div className="lg:col-span-1">
                                 <div className="sticky top-4 space-y-4">
                                     <MiniCartPreview
-                                        items={items}
+                                        items={cartItems}
                                         theme={theme}
                                     />
 
@@ -162,7 +164,7 @@ export default function ShippingPage({items = [], tax  , shippingData, setShippi
                                         tax={tax}
                                         total={total}
                                         theme={theme}
-                                        itemCount={items.length}
+                                        itemCount={cartItems.length}
                                         ctaButton={
                                             <button
                                                 type="submit"

@@ -65,7 +65,7 @@ class CartService
         return Cart::query()
             ->where('user_id', $userId)
             ->with(['productVariant' => function($q) use($withCategories) {
-                    $q->select('id', 'product_id', 'attrs', 'stock');
+                    $q->select('id', 'product_id', 'attrs', 'stock', 'price', 'sku');
                     $q->with(['product' => function($q2) use($withCategories){
                         $q2->select('id', 'name', 'description');
                         $q2->with('thumbnail') ;
@@ -80,7 +80,7 @@ class CartService
         }
         catch(Exception $e){
              Log::error('querying cart items Error :'. $e->getMessage());
-             return null ;
+             return collect([]) ;
         }
     }
 

@@ -14,14 +14,14 @@ use Illuminate\Support\Facades\Mail;
 class RoleController extends Controller
 {
     private const AVAILABLE_CLAIMS = [
-        ['value' => 'manages-products', 'label' => 'Manages Products'],
-        ['value' => 'manages-orders', 'label' => 'Manages Orders'],
-        ['value' => 'manages-customers', 'label' => 'Manages Customers'],
-        ['value' => 'views-reports', 'label' => 'Views Reports'],
-        ['value' => 'manages-settings', 'label' => 'Manages Settings'],
-        ['value' => 'manages-roles', 'label' => 'Manages Roles'],
-        ['value' => 'manages-banners', 'label' => 'Manages Banners'],
-        ['value' => 'manages-collections', 'label' => 'Manages Collections'],
+        ['value' => 'manage-products', 'label' => 'Manage Products'],
+        ['value' => 'manage-orders', 'label' => 'Manage Orders'],
+        ['value' => 'manage-customers', 'label' => 'Manage Customers'],
+        ['value' => 'view-reports', 'label' => 'View Reports'],
+        ['value' => 'manage-settings', 'label' => 'Manage Settings'],
+        ['value' => 'manage-roles', 'label' => 'Manage Roles'],
+        ['value' => 'manage-banners', 'label' => 'Manage Banners'],
+        ['value' => 'manage-collections', 'label' => 'Manage Collections'],
     ];
 
     public function index()

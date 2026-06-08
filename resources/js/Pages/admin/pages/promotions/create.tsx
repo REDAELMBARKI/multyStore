@@ -21,16 +21,6 @@ import { Badge } from '@/components/ui/badge';
 import { CustomDateTimePicker } from '@/components/ui/CustomDateTimePicker';
 import { addWeeks, addMonths, format, parseISO } from 'date-fns';
 
-interface Product {
-  id: number;
-  name: string;
-}
-
-interface Category {
-  id: number;
-  name: string;
-}
-
 interface Promotion {
   id?: number;
   name: string;
@@ -43,21 +33,15 @@ interface Promotion {
   valid_until: string | null;
   is_active: boolean;
   priority: number;
-  applicable_product_ids: number[] | null;
-  applicable_category_ids: number[] | null;
-  applicable_sub_category_ids: number[] | null;
 }
 
 interface Props {
   promotion?: Promotion;
-  products: Product[];
-  categories: Category[];
-  subCategories: Category[];
 }
 
 export default function Create() {
   const { theme } = useTheme();
-  const { promotion, products, categories, subCategories } = usePage().props as unknown as Props;
+  const { promotion } = usePage().props as unknown as Props;
   const isEditing = !!promotion;
 
   // Initialize Dates
@@ -75,9 +59,6 @@ export default function Create() {
     valid_until: format(initialEndDate, "yyyy-MM-dd HH:mm:ss"),
     is_active: promotion?.is_active ?? true,
     priority: promotion?.priority ?? 0,
-    applicable_product_ids: promotion?.applicable_product_ids || [],
-    applicable_category_ids: promotion?.applicable_category_ids || [],
-    applicable_sub_category_ids: promotion?.applicable_sub_category_ids || [],
   });
 
   const [startDate, setStartDate] = useState<Date | undefined>(initialStartDate);
@@ -122,26 +103,12 @@ export default function Create() {
     setEndDate(newEndDate);
   };
 
-  const categoryOptions: AllowedObjectsType[] = categories.map(c => ({ value: c.id, label: c.name }));
-  const subCategoryOptions: AllowedObjectsType[] = subCategories.map(c => ({ value: c.id, label: c.name }));
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isEditing) {
       put(route('promotions.update', promotion.id));
     } else {
       post(route('promotions.store'));
-    }
-  };
-
-  const selectedProducts = products.filter(p => data.applicable_product_ids?.includes(p.id));
-
-  const toggleProduct = (productId: number) => {
-    const current = data.applicable_product_ids || [];
-    if (current.includes(productId)) {
-      setData('applicable_product_ids', current.filter(id => id !== productId));
-    } else {
-      setData('applicable_product_ids', [...current, productId]);
     }
   };
 
@@ -325,38 +292,6 @@ export default function Create() {
                 </div>
               </CardContent>
             </Card>
-
-            <Card style={{ background: theme.card, border: `1px solid ${theme.border}`, boxShadow: theme.shadowMd }}>
-              <CardHeader className="border-b" style={{ borderColor: theme.border }}>
-                <CardTitle className="flex items-center gap-2" style={{ color: theme.text }}>
-                  <Layers className="h-5 w-5" style={{ color: theme.primary }} />
-                  Categories Applicability
-                </CardTitle>
-                <CardDescription style={{ color: theme.textMuted }}>Restrict promotion to specific categories</CardDescription>
-              </CardHeader>
-              <CardContent className="p-6 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label style={{ color: theme.text }}>Restrict to Categories</Label>
-                    <MultiSelectDropdownForObject
-                      label="Categories"
-                      options={categoryOptions}
-                      selectedValues={categoryOptions.filter(o => data.applicable_category_ids?.includes(o.value as number))}
-                      onChange={selected => setData('applicable_category_ids', selected.map(s => s.value as number))}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label style={{ color: theme.text }}>Restrict to Sub-categories</Label>
-                    <MultiSelectDropdownForObject
-                      label="Sub-categories"
-                      options={subCategoryOptions}
-                      selectedValues={subCategoryOptions.filter(o => data.applicable_sub_category_ids?.includes(o.value as number))}
-                      onChange={selected => setData('applicable_sub_category_ids', selected.map(s => s.value as number))}
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
 
           {/* Sidebar Info & Product Assignment */}
@@ -403,62 +338,6 @@ export default function Create() {
                   />
                 </div>
                 {errors.valid_until && <p className="text-xs font-medium" style={{ color: theme.error }}>{errors.valid_until}</p>}
-              </CardContent>
-            </Card>
-
-            <Card style={{ background: theme.card, border: `1px solid ${theme.border}`, boxShadow: theme.shadowMd }}>
-              <CardHeader className="border-b" style={{ borderColor: theme.border }}>
-                <div className="flex items-center justify-between gap-2">
-                  <CardTitle className="flex items-center gap-2" style={{ color: theme.text }}>
-                    <Package className="h-5 w-5" style={{ color: theme.primary }} />
-                    Products
-                  </CardTitle>
-                  <div className="w-48">
-                    <MultiSelectDropdownForObject 
-                      multiple={true}
-                      label="Assign Products"
-                      options={products.map(p => ({ label: p.name, value: p.id }))}
-                      selectedValues={[]}
-                      onChange={(selected: AllowedObjectsType[]) => {
-                        const newIds = selected.map(s => s.value as number);
-                        const current = data.applicable_product_ids || [];
-                        const uniqueIds = Array.from(new Set([...current, ...newIds]));
-                        setData('applicable_product_ids', uniqueIds);
-                      }}
-                    />
-                  </div>
-                </div>
-                <CardDescription style={{ color: theme.textMuted }}>Assign specific products to this promotion</CardDescription>
-              </CardHeader>
-              <CardContent className="p-4 max-h-[400px] overflow-auto">
-                <div className="space-y-2">
-                  {selectedProducts.length > 0 ? (
-                    selectedProducts.map(product => (
-                      <div 
-                        key={product.id}
-                        className="flex items-center justify-between p-2 rounded-md transition-all group"
-                        style={{ background: theme.bg, border: `1px solid ${theme.border}` }}
-                      >
-                        <span className="text-sm font-medium" style={{ color: theme.text }}>{product.name}</span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          type="button"
-                          className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => toggleProduct(product.id)}
-                          style={{ color: theme.error }}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-8 px-4 border-2 border-dashed rounded-lg" style={{ borderColor: theme.border }}>
-                      <Package className="mx-auto h-8 w-8 mb-2" style={{ color: theme.textMuted }} />
-                      <p className="text-xs" style={{ color: theme.textMuted }}>No products assigned. Promotion will apply to all products if no category restriction exists.</p>
-                    </div>
-                  )}
-                </div>
               </CardContent>
             </Card>
 

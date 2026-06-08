@@ -57,7 +57,7 @@ export default function ProductCardMaster({product}:{product : any}) {
   const handleViewDetails = (e?: React.MouseEvent) => {
     e?.preventDefault();
     e?.stopPropagation();
-    router.get(route('product.show', { product: product.id }));
+    router.get(route('product.show', { product: product.slug }));
   };
 
   const cardsMap : Record<CardOption , any>  =  {

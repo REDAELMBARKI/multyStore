@@ -1,6 +1,6 @@
 // Pages/Cart/components/CartItemRow.tsx
 import { ThemePalette } from "@/types/ThemeTypes";
-import { Plus, Minus } from "lucide-react";
+import { Plus, Minus, Trash2 } from "lucide-react";
 import { usePage } from "@inertiajs/react";
 
 interface CartItemRowProps {
@@ -34,7 +34,7 @@ export default function CartItemRow({
                     }}
                     className="w-20 h-20 flex-shrink-0 overflow-hidden"
                 >
-                    {item.product_variant.product.thumbnail ? (
+                    {item.product_variant?.product?.thumbnail ? (
                         <img
                             src={item.product_variant.product.thumbnail.url}
                             alt={item.product_variant.product.name}
@@ -60,48 +60,25 @@ export default function CartItemRow({
                         }}
                         className="font-medium mb-1"
                     >
-                        {item.product_variant.product.name}
+                        {item.product_variant?.product?.name || 'Unknown Product'}
                     </h3>
-                    {item.product_variant.sku && (
-                        <p
-                            style={{
-                                color: theme.textSecondary,
-                            }}
-                            className="text-xs mb-1"
-                        >
-                            Item #{item.product_variant.sku}
-                        </p>
-                    )}
                     <p
                         style={{
                             color: theme.textMuted,
                         }}
-                        className="text-xs mb-2"
+                        className="text-sm"
                     >
-                        {(item.product_variant.attributes || [])
-                            .map((attr) => attr.value)
-                            .join(", ")}
+                        {item.product_variant?.sku || 'No SKU'}
                     </p>
-                    {item.product_variant.stock_quantity &&
-                        item.product_variant.stock_quantity > 0 && (
-                            <p
-                                style={{
-                                    color: theme.success,
-                                }}
-                                className="text-xs font-medium"
-                            >
-                                ✓ In Stock, Ships within 4 hours
-                            </p>
-                        )}
                     <button
                         type="button"
                         onClick={() => onRemoveItem(item.id)}
                         style={{
                             color: theme.error,
                         }}
-                        className="text-xs hover:underline mt-2"
+                        className="text-xs hover:underline mt-2 flex items-center gap-1"
                     >
-                        Delete
+                        <Trash2 size={12} /> Delete
                     </button>
                 </div>
             </div>

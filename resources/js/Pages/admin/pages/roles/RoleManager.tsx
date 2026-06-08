@@ -231,7 +231,7 @@ export default function RoleManager({ roles, availableClaims }: { roles: Role[],
                     className="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider"
                     style={{ background: `${theme.primary}15`, color: theme.primary }}
                   >
-                    {claim.replace('_', ' ')}
+                    {claim.replace(/-/g, ' ')}
                   </span>
                 )) || <span className="text-[10px] text-slate-400 italic">No claims assigned</span>}
               </div>

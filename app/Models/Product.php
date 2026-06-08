@@ -113,18 +113,7 @@ class Product extends Model
 
     public function promotions()
     {
-        $categories = collect($this->nichCategory())->merge($this->subCategories());
-
-        return Promotion::where("is_active", true)
-            ->where(function ($q) use ($categories) {
-                $q->whereJsonContains("applicable_product_ids", $this->id);
-                $q->when($categories->count() > 0, function ($q) {
-                    $q->orWhereJsonContains("applicable_category_ids", $this->nichCategory()->value("id"));
-                    foreach ($this->subCategories()->pluck("id") as $catId) {
-                        $q->orWhereJsonContains("applicable_sub_category_ids", $catId);
-                    }
-                });
-            })->get();
+        return Promotion::where("is_active", true)->get();
     }
 
     public function reviews()
@@ -134,9 +123,8 @@ class Product extends Model
 
     public function ratingBreakdown()
     {
-        return Review::selectRaw(
-            'rating , count(*) as count'
-        )
+        return $this->reviews()
+            ->selectRaw('rating, count(*) as count')
             ->groupBy('rating')
             ->pluck('count', 'rating')
             ->toArray();

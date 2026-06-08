@@ -19,7 +19,7 @@ import SectionHeading from "./SectionHeading";
 import VideosSection from "./VideoSection";
 import ReviewsBreakDown from "./ReviewBreakDown";
 
-interface ProductDetailProps { onStepChange: (action: "next" | "prev") => void; }
+interface ProductDetailProps { onStepChange: (action: "next" | "prev", items?: any[]) => void; }
 interface FaqItem { question: string; answer: string; }
 interface Variant { id: number; price: number; compare_price?: number; stock: number; }
 interface Cover { id: string; url: string; }
@@ -277,13 +277,37 @@ const ProductDetails = ({ onStepChange }: ProductDetailProps) => {
     else router.post(route("cart.store"), { id: product.id, variant_id: defaultVariant?.id });
   };
   const handleBuyNow = () => {
-    if (shouldShowVariantModal) { setModalMode("buynow"); setModalOpen(true); }
-    else onStepChange("next");
+    if (shouldShowVariantModal && !selectedColor) { 
+        setModalMode("buynow"); 
+        setModalOpen(true); 
+    } else {
+        const variantToUse = selectedColor 
+            ? product.variants.find((v: any) => v.id === selectedColor.variant_id) 
+            : defaultVariant;
+            
+        onStepChange("next", [{
+            ...variantToUse,
+            name: product.name,
+            thumbnail: product.thumbnail,
+            quantity: 1,
+            price_snapshot: variantToUse?.price
+        }]);
+    }
   };
   const handleModalConfirm = (variant: VariantSchemaType) => {
     setModalOpen(false);
-    if (modalMode === "cart") router.post(route("cart.store"), { id: product.id, variant_id: variant.variant_id });
-    else onStepChange("next");
+    if (modalMode === "cart") {
+        router.post(route("cart.store"), { id: product.id, variant_id: variant.variant_id });
+    } else {
+        const variantToUse = product.variants.find((v: any) => v.id === variant.variant_id);
+        onStepChange("next", [{
+            ...variantToUse,
+            name: product.name,
+            thumbnail: product.thumbnail,
+            quantity: 1,
+            price_snapshot: variantToUse?.price
+        }]);
+    }
   };
 
   const trustReveal   = useReveal();

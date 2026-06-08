@@ -12,7 +12,11 @@ use App\Models\Media;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Promotion;
+use App\Models\Role;
 use App\Models\RuleBasedCollection;
+use App\Models\ShippingSetting;
+use App\Models\ShippingZone;
+use App\Models\ShippingZoneCity;
 use App\Models\Slider;
 use App\Models\Store;
 use App\Models\StoreSetting;
@@ -28,7 +32,9 @@ class NewStoreDefaultsSeeder extends Seeder
      */
     public function run(?int $storeId = null): void
     {
-        $storeId = $storeId ?? Store::first()?->id;
+        if (!$storeId) {
+             $storeId = Store::first()?->id;
+        }
 
         if (!$storeId) {
             return;
@@ -461,9 +467,9 @@ class NewStoreDefaultsSeeder extends Seeder
 
             // 8. Seed 3 Promotions
             $promotions = [
-                ['name' => 'Welcome Sale', 'type' => 'percentage', 'value' => 10, 'minimum_order_amount' => 500],
-                ['name' => 'Flash Deal', 'type' => 'percentage', 'value' => 25, 'minimum_order_amount' => 1000],
-                ['name' => 'Free Delivery', 'type' => 'free_shipping', 'value' => 0, 'minimum_order_amount' => 300],
+                ['name' => 'Welcome Sale', 'type' => 'percentage', 'value' => 10, 'minimum_order_amount' => 500, 'max_discount_amount' => 100],
+                ['name' => 'Flash Deal', 'type' => 'percentage', 'value' => 25, 'minimum_order_amount' => 1000, 'max_discount_amount' => 400],
+                ['name' => 'Free Delivery', 'type' => 'free_shipping', 'value' => 0, 'minimum_order_amount' => 300 ,'max_discount_amount' => 200],
             ];
 
             foreach ($promotions as $pData) {
@@ -493,6 +499,71 @@ class NewStoreDefaultsSeeder extends Seeder
                         'valid_until' => now()->addMonths(1),
                         'max_uses_per_user' => 1,
                     ])
+                );
+            }
+
+            // 10. Seed Shipping Settings & Zones
+            $shippingSettings = ShippingSetting::updateOrCreate(
+                ['store_id' => $storeId],
+                [
+                    'free_shipping_type' => 'amount',
+                    'free_shipping_threshold_amount' => 500,
+                    'shipping_class' => ['standard'],
+                ]
+            );
+
+            $zones = [
+                ['name' => 'Major Cities', 'price' => 30, 'estimated_days' => 2, 'cities' => ['Casablanca', 'Rabat', 'Marrakech']],
+                ['name' => 'Secondary Cities', 'price' => 45, 'estimated_days' => 4, 'cities' => ['Agadir', 'Fes', 'Tanger']],
+                ['name' => 'Remote Areas', 'price' => 60, 'estimated_days' => 7, 'cities' => ['Oujda', 'Kenitra', 'Tetouan']],
+            ];
+
+            foreach ($zones as $zData) {
+                $zone = ShippingZone::updateOrCreate(
+                    ['store_id' => $storeId, 'name' => $zData['name']],
+                    [
+                        'price' => $zData['price'],
+                        'estimated_days' => $zData['estimated_days'],
+                        'is_active' => true,
+                    ]
+                );
+
+                foreach ($zData['cities'] as $cityName) {
+                    ShippingZoneCity::updateOrCreate(
+                        ['shipping_zone_id' => $zone->id, 'city' => $cityName],
+                        []
+                    );
+                }
+            }
+
+            // 11. Seed Default Roles (Global for now, or add store_id if needed)
+            $roles = [
+                [
+                    'name' => 'Admin',
+                    'claims' => [
+                        'manage-products', 'manage-orders', 'manage-customers', 
+                        'view-reports', 'manage-settings', 'manage-roles', 
+                        'manage-banners', 'manage-collections'
+                    ],
+                ],
+                [
+                    'name' => 'Manager',
+                    'claims' => [
+                        'manage-products', 'manage-orders', 'manage-customers', 'view-reports'
+                    ],
+                ],
+                [
+                    'name' => 'Editor',
+                    'claims' => [
+                        'manage-banners', 'manage-collections'
+                    ],
+                ],
+            ];
+
+            foreach ($roles as $roleData) {
+                Role::updateOrCreate(
+                    ['name' => $roleData['name']],
+                    $roleData
                 );
             }
         });

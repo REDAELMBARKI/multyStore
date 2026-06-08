@@ -60,11 +60,15 @@ export default function CartSummary({
                 </div>
 
                 {currReachedMilestone?.type === 'discount' && (
-                    <div className="flex justify-between text-sm">
-                        <span style={{ color: theme.textSecondary }}>Discount:</span>
-                        <span style={{ color: theme.success }} className="font-semibold">
-                            - {(currReachedMilestone?.estimated_value ?? 0).toFixed(2)} {currency}
-                        </span>
+                    <div className="flex flex-col gap-1 mb-2">
+                        <div className="flex justify-between text-sm">
+                            <span style={{ color: theme.textSecondary }}>
+                                Discount ({currReachedMilestone.label}):
+                            </span>
+                            <span style={{ color: theme.success }} className="font-semibold">
+                                - {(currReachedMilestone?.estimated_value ?? 0).toFixed(2)} {currency}
+                            </span>
+                        </div>
                     </div>
                 )}
 

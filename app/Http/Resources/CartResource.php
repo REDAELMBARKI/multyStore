@@ -15,10 +15,16 @@ class CartResource extends JsonResource
      */
     public function toArray(Request $request): array
     {    
-        $all = parent::toArray($request) ;
         return [
-            ...$all ,
-            'productVariant' => []
+            'id' => $this->id,
+            'user_id' => $this->user_id,
+            'product_variant_id' => $this->product_variant_id,
+            'quantity' => $this->quantity,
+            'price_snapshot' => $this->price_snapshot,
+            'product_variant' => $this->productVariant,
+            'subtotal' => $this->productVariant ? $this->productVariant->price * $this->quantity : 0,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ] ;
     }
 

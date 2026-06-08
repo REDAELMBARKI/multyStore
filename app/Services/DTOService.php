@@ -20,7 +20,8 @@ class DTOService
             "quantity" => $param["quantity"],
             "price_snapshot" => $item["price"],
             "subtotal"=> $item["price"] * $param["quantity"],
-            "product_variant" =>  $item
+            "product_variant" =>  $item,
+            "product" => $item["product"] ?? []
         ];
     }
     public function prepareItemsToMatchCheckoutItemDTO(Collection $items , Collection $params) {

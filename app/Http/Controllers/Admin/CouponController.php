@@ -15,14 +15,14 @@ class CouponController extends Controller
     {
     }
 
-    public function index()
+    public function index($tenant)
     {
         return Inertia::render('admin/pages/coupons/index', [
             'coupons' => $this->couponService->getAllCoupons()
         ]);
     }
 
-    public function create()
+    public function create($tenant)
     {
         return Inertia::render('admin/pages/coupons/create', [
             'products' => Product::all(['id', 'name']),
@@ -31,13 +31,13 @@ class CouponController extends Controller
         ]);
     }
 
-    public function store(CouponRequest $request)
+    public function store($tenant, CouponRequest $request)
     {
         $this->couponService->createCoupon($request->validated());
         return redirect()->route('coupons.index')->with('success', 'Coupon created successfully');
     }
 
-    public function edit($id)
+    public function edit($tenant, $id)
     {
         $coupon = $this->couponService->getCouponById($id);
         if (!$coupon) {
@@ -52,13 +52,13 @@ class CouponController extends Controller
         ]);
     }
 
-    public function update(CouponRequest $request, $id)
+    public function update($tenant, CouponRequest $request, $id)
     {
         $this->couponService->updateCoupon($id, $request->validated());
         return redirect()->route('coupons.index')->with('success', 'Coupon updated successfully');
     }
 
-    public function destroy($id)
+    public function destroy($tenant, $id)
     {
         $this->couponService->deleteCoupon($id);
         return redirect()->route('coupons.index')->with('success', 'Coupon deleted successfully');

@@ -82,9 +82,14 @@ class ShippingService
      }
     
     
-    public function calculateShipping(array $items ,string $city , ?int $promotion_id = null): float
+    public function calculateShipping(array $items ,string $cityName , ?int $promotion_id = null): float
     {  
-               $city = $this->shippingRepository->getCity($city);
+               $city = $this->shippingRepository->getCity($cityName);
+               
+               if (!$city) {
+                    throw new ShippingException("City '{$cityName}' is not supported.");
+               }
+
                $zone = $city->shipping_zone()->first(['id' , 'price' , 'type' , 'is_active']);
                $settings = $this->getShippingSettings();
                

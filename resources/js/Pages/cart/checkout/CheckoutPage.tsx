@@ -40,8 +40,10 @@ export default function CheckoutPage({ postUrl , items = [], tax, shippingData ,
     const [coupon_code, setCoupon_code] = useState("");
     const [discount, setDiscount] = useState(0);
     const {addToast} = useToast()
-    const subtotal = items.reduce(
-        (sum, item) => sum + item.price_snapshot * item.quantity,
+    const cartItems = Array.isArray(items) ? items : (items as any)?.data || [];
+
+    const subtotal = cartItems.reduce(
+        (sum: number, item: any) => sum + (Number(item.price_snapshot) || 0) * (Number(item.quantity) || 0),
         0
     );
     const shipping = Number(zone?.price ?? 0);
@@ -150,7 +152,7 @@ export default function CheckoutPage({ postUrl , items = [], tax, shippingData ,
                             <div className="lg:col-span-1">
                                 <div className="sticky top-4 space-y-4">
                                     <MiniCartPreview
-                                        items={items}
+                                        items={cartItems}
                                         theme={theme}
                                     />
 
@@ -164,7 +166,7 @@ export default function CheckoutPage({ postUrl , items = [], tax, shippingData ,
                                         coupon_code={coupon_code}
                                         onPromoChange={setCoupon_code}
                                         theme={theme}
-                                        itemCount={items.length}
+                                        itemCount={cartItems.length}
                                         showPromoCode={true}
                                         showSecurityBadge={true}
                                         ctaButton={

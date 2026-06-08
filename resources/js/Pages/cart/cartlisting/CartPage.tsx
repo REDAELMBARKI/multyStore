@@ -41,11 +41,12 @@ export interface Milestone {
     max?: number;
 }
 
-export default function CartPage({ onStepChange }: CartPageProps) {
+export default function CartPage({ items = [], onStepChange }: CartPageProps & { items: any[] }) {
     const {
         state: { currentTheme: theme },
     } = useStoreConfigCtx();
-    const { items , defaultShippingAmount , currency } = usePage().props as CartProps;
+    
+    const { defaultShippingAmount, currency } = usePage().props as any;
     const [currAndNextMilestone, setCurrAndNextMilestone] = useState<{
         curr : Milestone | null , 
         next : Milestone
@@ -59,8 +60,10 @@ export default function CartPage({ onStepChange }: CartPageProps) {
     const [prevReachedCount, setPrevReachedCount] = useState(0);
     const { addToast } = useToast();
     // Calculate totals
-    const subtotal = items.reduce(
-        (sum, item) => sum + item.price_snapshot * item.quantity,
+    const cartItems = Array.isArray(items) ? items : (items as any)?.data || [];
+    
+    const subtotal = cartItems.reduce(
+        (sum: number, item: any) => sum + (item.price_snapshot || 0) * (item.quantity || 0),
         0
     );
     
@@ -229,8 +232,8 @@ export default function CartPage({ onStepChange }: CartPageProps) {
 
                             {/* Cart Items List */}
                             <CartItemsList
-                                items={items}
-                                theme={theme}
+                            items={cartItems}
+                            theme={theme}
                                 coupon_code={coupon_code}
                                 onCouponChange={setCoupon_code}
                                 onQuantityChange={handleQuantityChange}
@@ -250,7 +253,7 @@ export default function CartPage({ onStepChange }: CartPageProps) {
                                         nextMilestone={currAndNextMilestone?.next ?? null}
                                         currReachedMilestone={currAndNextMilestone?.curr ?? null}
                                         isFreeShipping={isFreeShippingReached}
-                                        itemCount={items.length}
+                                        itemCount={cartItems.length}
                                         theme={theme}
                                         currency={currency}
                                         onProceedToCheckout={handleProceedToCheckout}

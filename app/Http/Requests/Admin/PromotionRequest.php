@@ -29,9 +29,6 @@ class PromotionRequest extends FormRequest
             'valid_until' => 'nullable|date|after_or_equal:valid_from',
             'is_active' => 'required|boolean',
             'priority' => 'required|integer',
-            'applicable_product_ids' => 'nullable|array',
-            'applicable_category_ids' => 'nullable|array',
-            'applicable_sub_category_ids' => 'nullable|array',
         ];
     }
 }

@@ -17,4 +17,4 @@ Route::post('api/webhook/stripe', [StripeWebhookController::class, 'handle']);
 
 Route::match(['get', 'post'], '/shipping/calculate/{name}', [ShippingController::class, 'calculate'])->name('shipping.calculate');
 
-Route::get('/reward/calculateBestRewardForUser', [PromotionController::class, 'calculateBestRewardForUser'])->name('shipping.calculateBestRewardForUser');
+// Route removed: shipping.calculateBestRewardForUser is already in web.php under tenant group
