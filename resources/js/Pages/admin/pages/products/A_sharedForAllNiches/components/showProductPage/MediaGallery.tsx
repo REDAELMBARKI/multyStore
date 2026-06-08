@@ -19,7 +19,15 @@ export const MediaGallery: React.FC<MediaGalleryProps> = ({ media, video, theme,
 
   useEffect(() => {
     if (selectedColor == null) return;
-    const idx = allMedia.findIndex(m => m.variant_id === selectedColor.variant_id);
+    
+    // First try to find by exact variant_id
+    let idx = allMedia.findIndex(m => m.variant_id === selectedColor.variant_id);
+    
+    // If not found, try to find by color name (covers cases where image is on a different variant of same color)
+    if (idx === -1 && selectedColor.name) {
+      idx = allMedia.findIndex(m => m.color_name === selectedColor.name);
+    }
+    
     if (idx !== -1) setCurrentIndex(idx);
   }, [selectedColor]);
 

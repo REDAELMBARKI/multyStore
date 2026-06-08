@@ -30,6 +30,11 @@ class ItemEligibilityService
          * @throws DiscountException
          */
         public function assertApplicabilityForItem(Coupon | Promotion $discount , array $item) {
+                // Promotions no longer have product/category targeting
+                if ($discount instanceof Promotion) {
+                    return;
+                }
+
                 $applicableProductsIds = $discount->applicable_product_ids ?? [] ;
                 $applicableCategoriesIds = collect($discount->applicable_category_ids ?? [])
                                            ->merge($discount->applicable_sub_category_ids ?? [])->toArray();

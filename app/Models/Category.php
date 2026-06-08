@@ -33,13 +33,7 @@ class Category extends Model
         return $query->get();
     }
     public function promotions(){
-        $query = Promotion::query() ;
-        if($this->parent_id){
-           $query->whereJsonContains('applicable_sub_category_ids' , $this->id) ;
-        }else{
-           $query->whereJsonContains('applicable_category_ids' , $this->id) ;
-        }
-        return $query->get();
+        return Promotion::where('is_active', true)->get();
     }
 
 }

@@ -323,7 +323,11 @@ export function DraftRow({ draft, onDelete, onDuplicate, isFirst }: DraftRowProp
       <div className="flex items-center gap-4 px-4 py-3">
 
         {/* Thumbnail with skeleton */}
-        <div className="flex-shrink-0 relative" style={{ width: 56, height: 56 }}>
+        <div 
+          className="flex-shrink-0 relative cursor-pointer hover:opacity-80 transition-opacity" 
+          style={{ width: 56, height: 56 }}
+          onClick={() => router.visit(route('product.edit', { product: draft.slug || draft.id }))}
+        >
           {coverImage ? (
             <>
               {!imgLoaded && (
@@ -348,7 +352,10 @@ export function DraftRow({ draft, onDelete, onDuplicate, isFirst }: DraftRowProp
         </div>
 
         {/* Info */}
-        <div className="flex-1 min-w-0">
+        <div 
+          className="flex-1 min-w-0 cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={() => router.visit(route('product.edit', { product: draft.slug || draft.id }))}
+        >
           <div className="flex items-center gap-2 mb-0.5">
             <h3 className="text-sm font-semibold truncate" style={{ color: t.text }}>
               {draft.name || 'Untitled Product'}
@@ -402,14 +409,14 @@ export function DraftRow({ draft, onDelete, onDuplicate, isFirst }: DraftRowProp
         <div className="flex items-center gap-1.5 flex-shrink-0">
           <button
 
-            onClick={() => router.visit(route('product.show', { product: draft.id }))}
+            onClick={() => router.visit(route('product.show', { product: draft.slug || draft.id }))}
             className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors hover:opacity-75"
             style={{ borderColor: t.border, color: t.textSecondary, background: 'transparent' }}
           >
             <Eye size={12} /> Preview
           </button>
           <button
-            onClick={() => router.visit(route('product.edit', { product: draft.id }))}
+            onClick={() => router.visit(route('product.edit', { product: draft.slug || draft.id }))}
             className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors hover:opacity-75"
             style={{ borderColor: t.border, color: t.text, background: 'transparent' }}
           >

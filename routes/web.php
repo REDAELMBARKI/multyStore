@@ -181,7 +181,7 @@ Route::prefix('products')->group(function(){
     Route::get('' , [ProductController::class, 'index'])->name('products') ;
     Route::get('/drafts' , [ProductController::class, 'drafts'])->name('drafts.index') ;
     Route::get('/create' , [ProductController::class, 'create'])->name('products.create') ;
-    Route::get('/{product:id}/edit' , [ProductController::class, 'edit'])->name('product.edit') ;
+    Route::get('/{product}/edit' , [ProductController::class, 'edit'])->name('product.edit') ;
     // drafts
     Route::post('/drafts' , [ProductController::class, 'storeDraft'])->name('products.storeDraft');
     Route::patch('/{product:id}/publish' , [ProductController::class, 'publish'])->name('product.publish');
@@ -192,7 +192,7 @@ Route::prefix('products')->group(function(){
 })->can('manage-products');
 
 // Public Product Detail
-Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('product.show');
+Route::get('/products/{product}', [ProductController::class, 'show'])->name('product.show');
 
 // media section
 // store media route

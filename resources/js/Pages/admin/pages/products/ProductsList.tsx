@@ -326,7 +326,7 @@ export default function ProductsList() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => router.visit(route("product.edit", { product: product.id }))}
+                                onClick={() => router.visit(route("product.edit", { product: product.slug || product.id }))}
                                 className="hover:scale-110 transition-transform"
                                 style={{
                                   border: `1px solid ${theme.border}`,

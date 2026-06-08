@@ -25,9 +25,7 @@ class CategoryService
                 return in_array($cat->id , $c->$collumn ?? []);
             });
 
-           $cat->promotions = $allPromotions->filter(function($c) use ($cat , $collumn){
-                return in_array($cat->id , $c->$collumn ?? []);
-            });
+           $cat->promotions = $allPromotions;
 
             return $cat ;
         });

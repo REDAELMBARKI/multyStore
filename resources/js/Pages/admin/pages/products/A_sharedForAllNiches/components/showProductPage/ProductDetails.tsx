@@ -269,7 +269,12 @@ const ProductDetails = ({ onStepChange }: ProductDetailProps) => {
 
   const galleryMedia = (product?.covers ?? [])
     .filter((c: any) => c !== null)
-    .map((c: any) => ({ id: c.id, url: c.url, variant_id: c.variant_id }));
+    .map((c: any) => ({ 
+        id: c.id, 
+        url: c.url, 
+        variant_id: c.variant_id,
+        color_name: c.color_name
+    }));
 
 
   const handleAddToCart = () => {

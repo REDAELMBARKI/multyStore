@@ -40,16 +40,23 @@ class ProductDetailResource extends JsonResource
                 ->values()
                 ->toArray()
                 ;
+
+        $mappedVariantImages = $variantsImages->map(function(Media $i) use ($variants) {
+            $variant = $variants->firstWhere('id', $i->mediaable_id);
+            return [
+                ...$i->toArray(),
+                "variant_id" => $i->mediaable_id,
+                "color_name" => $variant ? ($variant->attrs['color']['name'] ?? null) : null
+            ];
+        })->toArray();
+
         return [
             ...Arr::except(parent::toArray($request) , ['thumbnail' , 'vendor' , 'slug' , 'variants' , 'nich_category' , 'sub_categories']),
            "variants" => $variants,
            "covers" => [
              $this->whenLoaded("thumbnail") ,
              ...$this->whenLoaded("covers") ,
-             ...$variantsImages->map(fn(Media $i) =>  ([
-                ...$i->toArray() ,
-                "variant_id" => $i->mediaable_id
-                ]))->toArray(),
+             ...$mappedVariantImages,
            ] ,
            "colors" => $colors ,
            "rating_breakdown" => (object) $this->ratingBreakdown() ,

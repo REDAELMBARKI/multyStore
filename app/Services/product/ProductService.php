@@ -298,8 +298,12 @@ class ProductService {
 
     }
 
-   private function attachApplicableProducts(Product $product, array $ids, string $model): void
+    private function attachApplicableProducts(Product $product, array $ids, string $model): void
     {
+        if ($model === Promotion::class) {
+            return;
+        }
+
         $items = $model::whereIn('id', $ids)->get();
         $relatedItems = $model::whereJsonContains('applicable_product_ids', $product->id)->get();
         // Remove product from deselected

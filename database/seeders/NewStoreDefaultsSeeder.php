@@ -414,18 +414,34 @@ class NewStoreDefaultsSeeder extends Seeder
 
             // 7. Seed 18 Default Products (6 per collection)
             $productTypes = [
-                ['badge' => $badgeMap['New'] ?? null, 'cat' => 'Fashion', 'prefix' => 'New Arrival'],
-                ['badge' => $badgeMap['Featured'] ?? null, 'cat' => 'Fashion', 'prefix' => 'Featured'],
-                ['badge' => $badgeMap['None'] ?? null, 'cat' => 'Fashion', 'prefix' => 'Shoe'],
+                [
+                    'badge' => $badgeMap['New'] ?? null,
+                    'cat' => 'Fashion',
+                    'prefix' => 'Classic Tee',
+                    'attrs' => ['size' => ['S', 'M', 'L', 'XL'], 'color' => ['Black', 'White', 'Blue'], 'style' => ['Casual', 'Slim Fit']]
+                ],
+                [
+                    'badge' => $badgeMap['Featured'] ?? null,
+                    'cat' => 'Electronics',
+                    'prefix' => 'Smartphone X',
+                    'attrs' => ['ram' => ['8GB', '12GB', '16GB'], 'storage' => ['128GB', '256GB', '512GB'], 'color' => ['Silver', 'Graphite']]
+                ],
+                [
+                    'badge' => $badgeMap['Hot'] ?? null,
+                    'cat' => 'Home',
+                    'prefix' => 'Minimalist Chair',
+                    'attrs' => ['style' => ['Modern', 'Vintage', 'Industrial'], 'color' => ['Grey', 'Brown', 'Beige']]
+                ],
             ];
 
             $count = 1;
             foreach ($productTypes as $type) {
                 for ($j = 1; $j <= 6; $j++) {
+                    $productName = "{$type['prefix']} #{$j}";
                     $product = Product::updateOrCreate(
-                        ['store_id' => $storeId, 'slug' => Str::slug("{$type['prefix']}-{$j}") . '-' . $storeId],
+                        ['store_id' => $storeId, 'slug' => Str::slug($productName) . '-' . $storeId],
                         [
-                            'name' => "{$type['prefix']} #{$j}",
+                            'name' => $productName,
                             'brand' => 'MicroMarket',
                             'description' => "This is a premium {$type['prefix']} product description for item #{$j}.",
                             'status' => 'published',
@@ -437,16 +453,37 @@ class NewStoreDefaultsSeeder extends Seeder
                         ]
                     );
 
-                    ProductVariant::updateOrCreate(
-                        ['product_id' => $product->id, 'sku' => "SKU-PROD-{$count}-" . $storeId],
-                        [
-                            'price' => rand(100, 1000),
-                            'compare_price' => rand(1100, 1500),
-                            'stock' => 50,
-                            'is_default' => true,
-                            'is_single' => true,
-                        ]
-                    );
+                    // Generate variants based on attributes
+                    $attrKeys = array_keys($type['attrs']);
+                    $firstAttr = $attrKeys[0];
+                    $secondAttr = $attrKeys[1] ?? null;
+
+                    foreach ($type['attrs'][$firstAttr] as $idx => $val1) {
+                        $val2 = $secondAttr ? $type['attrs'][$secondAttr][array_rand($type['attrs'][$secondAttr])] : null;
+                        $attrs = [$firstAttr => $val1];
+                        if ($val2) $attrs[$secondAttr] = $val2;
+                        
+                        // Add more attributes if available
+                        if (isset($attrKeys[2])) {
+                            $val3 = $type['attrs'][$attrKeys[2]][array_rand($type['attrs'][$attrKeys[2]])];
+                            $attrs[$attrKeys[2]] = $val3;
+                        }
+
+                        $isDefault = ($idx === 0);
+                        $price = rand(100, 1000);
+                        
+                        ProductVariant::updateOrCreate(
+                            ['product_id' => $product->id, 'sku' => Str::upper(Str::slug($productName) . "-" . implode("-", array_values($attrs))) . "-" . $storeId],
+                            [
+                                'price' => $price,
+                                'compare_price' => $price * 1.2,
+                                'stock' => rand(10, 100),
+                                'is_default' => $isDefault,
+                                'is_single' => false,
+                                'attrs' => $attrs,
+                            ]
+                        );
+                    }
 
                     // Add thumbnail
                     Media::updateOrCreate(

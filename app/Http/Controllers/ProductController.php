@@ -131,8 +131,16 @@ class ProductController extends Controller
         
         
         
-    public function edit($tenant, Product $product){
+    public function edit($tenant, $product){
             try {
+            $store = request()->attributes->get('tenant_store');
+            $product = Product::withoutGlobalScopes()->where(function($q) use ($product) {
+                  $q->where('id', $product)
+                    ->orWhere('slug', $product);
+            })
+            ->where('store_id', $store->id)
+            ->firstOrFail();
+
             $product = $product->load(['thumbnail', 'covers', 'videos', 'tags', 'variants.images', 'subCategories']);
             $parents = DB::table('variants_options_settings')->whereNull('parent_id')->get(['key']) ;
             $options =[] ;
@@ -146,7 +154,7 @@ class ProductController extends Controller
                     'product' => new ProductResources($product),
                     'nich_cats' =>  $this->categoryService->get_niche_cats(),
                     'shipping_class' => ShippingSetting::value('shipping_class') ,
-                    'badges' => DB::table("badges")->get(['id' , 'name' , 'color' , 'icon']),
+                    'badges' => Badge::get(['id' , 'name' , 'color' , 'icon']),
                     'variants_options' => $options,
                  ]);
              } 
@@ -169,10 +177,16 @@ class ProductController extends Controller
 
 
     public function show($tenant, $product){
-       // Support both ID and Slug for flexibility
-       $product = Product::where('slug', $product)
-            ->orWhere('slug', $product)
-            ->firstOrFail();
+       \Log::info('Product show called', ['tenant' => $tenant, 'product' => $product]);
+       
+       $store = request()->attributes->get('tenant_store');
+       
+       $product = Product::withoutGlobalScopes()->where(function($q) use ($product) {
+             $q->where('id', $product)
+               ->orWhere('slug', $product);
+       })
+       ->where('store_id', $store->id)
+       ->firstOrFail();
 
        $product->load('variants','nichCategory','subCategories','thumbnail',
                       'covers' , 'videos'  , 'badge' , 'reviews.user.avatar');

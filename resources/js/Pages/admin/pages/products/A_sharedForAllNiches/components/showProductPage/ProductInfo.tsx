@@ -242,7 +242,12 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
   }, [ac, ac2, gold]);
 
   useEffect(() => {
-    if (colors.length > 0) onColorSelect(colors[0]);
+    if (colors.length > 0) {
+        // Find default variant's color if available, else first color
+        const defaultV = variants?.find(v => v.is_default);
+        const defaultColor = colors.find(c => c.variant_id === defaultV?.id) || colors[0];
+        onColorSelect(defaultColor);
+    }
     if (sizes.length > 0)  setSelectedSize(sizes[2] ?? sizes[0]);
   }, []);
 
