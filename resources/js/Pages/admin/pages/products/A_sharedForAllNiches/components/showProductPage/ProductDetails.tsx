@@ -272,7 +272,7 @@ const ProductDetails = ({ onStepChange }: ProductDetailProps) => {
     .map((c: any) => ({ 
         id: c.id, 
         url: c.url, 
-        variant_id: c.variant_id,
+        variant_id: c.variant_id ? Number(c.variant_id) : undefined,
         color_name: c.color_name
     }));
 

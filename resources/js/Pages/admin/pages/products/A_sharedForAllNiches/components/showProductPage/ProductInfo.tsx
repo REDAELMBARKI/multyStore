@@ -253,11 +253,17 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
 
   useEffect(() => {
     if (!selectedColor || !variants) return;
-    const v = variants.find(v => v.id === selectedColor.variant_id);
-    if (!v) return;
-    setDisplayPrice(String(v.price));
-    setDisplayCompare(v.compare_price ? String(v.compare_price) : undefined);
-    setDisplayStock(v.stock);
+    
+    // Find variant by ID
+    const v = variants.find(v => Number(v.id) === Number(selectedColor.variant_id));
+    
+    // Fallback: Find first variant with matching color name if ID match fails
+    const finalV = v || (selectedColor.name ? variants.find(v => (v as any).attrs?.color === selectedColor.name || (v as any).attrs?.color?.name === selectedColor.name) : null);
+    
+    if (!finalV) return;
+    setDisplayPrice(String(finalV.price));
+    setDisplayCompare(finalV.compare_price ? String(finalV.compare_price) : undefined);
+    setDisplayStock(finalV.stock);
   }, [selectedColor, variants]);
 
   const saveAmount = (() => {

@@ -30,10 +30,11 @@ class ProductDetailResource extends JsonResource
                     return isset($variant->attrs['color']);
                 })
                 ->map(function ($variant){
+                    $colorData = $variant->attrs['color'];
                     return [
                         "variant_id"=> $variant->id,
-                        "hex" => $variant->attrs['color']['hex'] ?? null ,
-                        "name" => $variant->attrs['color']['name'] ?? null ,
+                        "hex" => is_array($colorData) ? ($colorData['hex'] ?? null) : null ,
+                        "name" => is_array($colorData) ? ($colorData['name'] ?? null) : $colorData ,
                     ] ;
                 })
                 ->unique('name')
@@ -43,10 +44,11 @@ class ProductDetailResource extends JsonResource
 
         $mappedVariantImages = $variantsImages->map(function(Media $i) use ($variants) {
             $variant = $variants->firstWhere('id', $i->mediaable_id);
+            $colorData = $variant->attrs['color'] ?? null;
             return [
                 ...$i->toArray(),
-                "variant_id" => $i->mediaable_id,
-                "color_name" => $variant ? ($variant->attrs['color']['name'] ?? null) : null
+                "variant_id" => (int) $i->mediaable_id,
+                "color_name" => is_array($colorData) ? ($colorData['name'] ?? null) : $colorData
             ];
         })->toArray();
 

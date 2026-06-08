@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ThemePalette } from "@/types/ThemeTypes";
 import { Color } from "@/types/inventoryTypes";
 
-interface Media { url: string; id: string | number; }
+interface Media { url: string; id: string | number; variant_id?: number; color_name?: string; }
 
 interface MediaGalleryProps {
   media: (Media & { variant_id: number })[];
@@ -18,17 +18,24 @@ export const MediaGallery: React.FC<MediaGalleryProps> = ({ media, video, theme,
   const allMedia = [...media];
 
   useEffect(() => {
-    if (selectedColor == null) return;
+    if (!selectedColor) return;
     
-    // First try to find by exact variant_id
-    let idx = allMedia.findIndex(m => m.variant_id === selectedColor.variant_id);
+    console.log('Selected Color:', selectedColor);
+    console.log('All Media:', allMedia);
     
-    // If not found, try to find by color name (covers cases where image is on a different variant of same color)
+    // 1. Try to find media that matches the EXACT variant_id of the selected color
+    let idx = allMedia.findIndex(m => Number(m.variant_id) === Number(selectedColor.variant_id));
+    
+    // 2. If not found, try to find media that matches the color NAME 
     if (idx === -1 && selectedColor.name) {
       idx = allMedia.findIndex(m => m.color_name === selectedColor.name);
     }
     
-    if (idx !== -1) setCurrentIndex(idx);
+    console.log('Found Index:', idx);
+    
+    if (idx !== -1) {
+      setCurrentIndex(idx);
+    }
   }, [selectedColor]);
 
   const goTo = (i: number) => setCurrentIndex(i);
